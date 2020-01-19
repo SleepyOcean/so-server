@@ -1,0 +1,14 @@
+server:
+  port: 9000
+  tomcat:
+    uri-encoding: UTF-8
+    max-threads: 100
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10485760
+      max-request-size: 104857600
+logging:
+  level:
+    root: error
+    com.sleepy: info

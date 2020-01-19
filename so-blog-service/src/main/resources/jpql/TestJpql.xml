@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<jpa module="testJpql">
+    <jpql id="customSQL" resultClass="java.util.HashMap" native="true">
+        select * from so_tag where 1=1
+        #if($title)
+        and title like :title
+        #end
+        #if($readCount)
+        and read_count &gt; :readCount
+        #end
+        #if($tagNames)
+        and tag_name in (:tagNames)
+        #end
+        limit 10
+    </jpql>
+</jpa>
