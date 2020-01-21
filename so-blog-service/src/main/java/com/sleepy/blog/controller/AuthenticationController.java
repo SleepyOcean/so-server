@@ -1,6 +1,8 @@
 package com.sleepy.blog.controller;
 
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,4 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin
 @RequestMapping("/auth")
 public class AuthenticationController {
+    @ApiOperation("退出登录")
+    @GetMapping("/logoutSuccess")
+    public void logoutSuccess() {
+    }
+
+    @ApiOperation("登录成功")
+    @GetMapping("/loginInfo")
+    public void loginSuccess() {
+    }
 }
