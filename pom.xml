@@ -22,7 +22,6 @@
         <module>so-blog-service</module>
         <module>so-file-system</module>
         <module>so-jpql-template-engine</module>
-        <module>so-security-starter</module>
     </modules>
 
     <dependencies>
@@ -61,15 +60,8 @@
         <repository>
             <id>oceanmaven</id>
             <name>ocean maven</name>
-            <url>http://nexus.sleepyocean.cn:8050/repository/maven-ocean/</url>
+            <url>http://nexus.sleepyocean.cn/repository/maven-ocean/</url>
         </repository>
     </repositories>
-    <distributionManagement>
-        <repository>
-            <id>oceanmaven</id>
-            <name>ocean maven</name>
-            <url>http://nexus.sleepyocean.cn:8050/repository/maven-ocean/</url>
-        </repository>
-    </distributionManagement>
 
 </project>
