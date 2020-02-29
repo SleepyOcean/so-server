@@ -22,7 +22,6 @@
         <module>so-blog-service</module>
         <module>so-file-system</module>
         <module>so-security-starter</module>
-        <module>so-jpql-template-engine</module>
     </modules>
 
     <dependencies>
