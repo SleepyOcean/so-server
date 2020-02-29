@@ -21,7 +21,8 @@
         <module>so-common</module>
         <module>so-blog-service</module>
         <module>so-file-system</module>
-        <module>so-jpql-core</module>
+        <module>so-jpql-template-engine</module>
+        <module>so-security-starter</module>
     </modules>
 
     <dependencies>
@@ -57,6 +58,18 @@
             <name>alibaba</name>
             <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>oceanmaven</id>
+            <name>ocean maven</name>
+            <url>http://nexus.sleepyocean.cn:8050/repository/maven-ocean/</url>
+        </repository>
     </repositories>
+    <distributionManagement>
+        <repository>
+            <id>oceanmaven</id>
+            <name>ocean maven</name>
+            <url>http://nexus.sleepyocean.cn:8050/repository/maven-ocean/</url>
+        </repository>
+    </distributionManagement>
 
 </project>
