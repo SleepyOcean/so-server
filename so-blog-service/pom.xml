@@ -73,6 +73,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
+        <finalName>blog-server</finalName>
     </build>
 
 </project>
