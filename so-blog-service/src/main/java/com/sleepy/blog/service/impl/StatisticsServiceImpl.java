@@ -4,7 +4,7 @@ import com.sleepy.blog.dto.ChartOfBarDTO;
 import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.blog.repository.ArticleRepository;
 import com.sleepy.blog.service.StatisticsService;
-import com.sleepy.common.util.DateUtil;
+import com.sleepy.common.tools.DateTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public CommonDTO<ChartOfBarDTO> getArticleStatistics() throws Exception {
         CommonDTO<ChartOfBarDTO> result = new CommonDTO<>();
-        List<ChartOfBarDTO> resultList = articleRepository.getArticleStatistic(DateUtil.getDateWithCurrent(-3, Calendar.MONTH), new Date());
+        List<ChartOfBarDTO> resultList = articleRepository.getArticleStatistic(DateTools.getDateWithCurrent(-3, Calendar.MONTH), new Date());
 
         Map<String, Object> extra = new HashMap<>(2);
         extra.put("xAxis", resultList.stream().map(o -> o.getXAxis().substring(0, 10)).collect(Collectors.toList()));

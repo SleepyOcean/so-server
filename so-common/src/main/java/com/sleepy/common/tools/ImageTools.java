@@ -1,4 +1,4 @@
-package com.sleepy.common.util;
+package com.sleepy.common.tools;
 
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.FileUtils;
@@ -13,7 +13,7 @@ import java.io.IOException;
  * @author gehoubao
  * @create 2019-10-23 13:49
  **/
-public class ImageUtil {
+public class ImageTools {
 
     /**
      * 压缩图片
@@ -35,16 +35,16 @@ public class ImageUtil {
      */
     public static String base64ToImgFile(String base64Str, String destFileName) throws IOException {
         String format = null;
-        if (destFileName.contains(StringUtil.POINT)) {
+        if (destFileName.contains(StringTools.POINT)) {
             format = destFileName.substring(destFileName.indexOf(".") + 1);
             destFileName = destFileName.substring(0, destFileName.indexOf("."));
         }
-        if (base64Str.contains(StringUtil.COMMA)) {
+        if (base64Str.contains(StringTools.COMMA)) {
             format = base64Str.substring(base64Str.indexOf("/") + 1, base64Str.indexOf(";"));
             base64Str = base64Str.substring(base64Str.indexOf(",") + 1);
         }
 
-        String dest = destFileName + StringUtil.POINT + (StringUtil.isNullOrEmpty(format) ? "jpg" : format);
+        String dest = destFileName + StringTools.POINT + (StringTools.isNullOrEmpty(format) ? "jpg" : format);
         //对字节数组字符串进行Base64解码并生成图片
         byte[] bs = Base64Utils.decodeFromString(base64Str);
         FileUtils.writeByteArrayToFile(new File(dest), bs);
@@ -52,7 +52,7 @@ public class ImageUtil {
     }
 
     public static void main(String[] args) throws IOException {
-        String src = FileUtil.readToString("E:\\Dev Tools\\DockerFile\\ImageServer\\test");
+        String src = FileTools.readToString("E:\\Dev Tools\\DockerFile\\ImageServer\\test");
         String dest = "E:\\Dev Tools\\DockerFile\\ImageServer\\home-bg.jpg";
         base64ToImgFile(src, dest);
     }

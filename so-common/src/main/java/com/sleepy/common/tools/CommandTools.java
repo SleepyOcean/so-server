@@ -1,4 +1,4 @@
-package com.sleepy.common.util;
+package com.sleepy.common.tools;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
  * @author gehoubao
  * @create 2019-09-30 14:42
  **/
-public class CommandUtil {
+public class CommandTools {
 
     /**
      * 执行控制台命令

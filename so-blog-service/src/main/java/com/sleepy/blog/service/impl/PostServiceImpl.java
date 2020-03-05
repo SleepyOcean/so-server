@@ -13,8 +13,8 @@ import com.sleepy.blog.service.ImgService;
 import com.sleepy.blog.service.PostService;
 import com.sleepy.blog.vo.ImgVO;
 import com.sleepy.blog.vo.PostVO;
-import com.sleepy.common.util.DateUtil;
-import com.sleepy.common.util.StringUtil;
+import com.sleepy.common.tools.DateTools;
+import com.sleepy.common.tools.StringTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -71,12 +71,12 @@ public class PostServiceImpl implements PostService {
         entity.setTitle(vo.getTitle());
         entity.setContent(vo.getContent());
         entity.setSummary(vo.getSummary());
-        if (!StringUtil.isNullOrEmpty(vo.getCoverImg())) {
+        if (!StringTools.isNullOrEmpty(vo.getCoverImg())) {
             entity.setCoverImg(getImgUrl(vo.getCoverImg(), vo.getTitle()));
         }
-        entity.setCreateTime(DateUtil.toDate(vo.getDate(), DateUtil.DEFAULT_DATETIME_PATTERN));
+        entity.setCreateTime(DateTools.toDate(vo.getDate(), DateTools.DEFAULT_DATETIME_PATTERN));
         entity.setTags(vo.getTags());
-        if (!StringUtil.isNullOrEmpty(vo.getId())) {
+        if (!StringTools.isNullOrEmpty(vo.getId())) {
             entity.setId(vo.getId());
             articleRepository.saveAndFlush(entity);
         } else {
@@ -127,12 +127,12 @@ public class PostServiceImpl implements PostService {
     @Override
     public CommonDTO<ArticleEntity> getArticle(PostVO vo) {
         CommonDTO<ArticleEntity> result = new CommonDTO<>();
-        if (!StringUtil.isNullOrEmpty(vo.getId())) {
+        if (!StringTools.isNullOrEmpty(vo.getId())) {
             Optional<ArticleEntity> set = articleRepository.findById(vo.getId());
             set.get().setReadCount(set.get().getReadCount() + 1L);
             articleRepository.save(set.get());
             result.setResult(set.get());
-        } else if (!StringUtil.isNullOrEmpty(vo.getTitle())) {
+        } else if (!StringTools.isNullOrEmpty(vo.getTitle())) {
             List<ArticleEntity> sets = articleRepository.findAllByTitleLike("%" + vo.getTitle() + "%");
             result.setResultList(sets);
             result.setTotal(Integer.valueOf(sets.size()).longValue());

@@ -5,7 +5,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.blog.vo.LoggerVO;
-import com.sleepy.common.util.StringUtil;
+import com.sleepy.common.tools.StringTools;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +25,7 @@ public class LoggerController {
     @PostMapping("/level")
     public CommonDTO<String> logLevelAdjust(@RequestBody LoggerVO vo) throws Exception {
         CommonDTO<String> result = new CommonDTO<>();
-        if (vo.getLoggers().size() > 0 && !StringUtil.isNullOrEmpty(vo.getLevel())) {
+        if (vo.getLoggers().size() > 0 && !StringTools.isNullOrEmpty(vo.getLevel())) {
             Level level = getLoggerLevel(vo.getLevel());
             for (String s : vo.getLoggers()) {
                 LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();

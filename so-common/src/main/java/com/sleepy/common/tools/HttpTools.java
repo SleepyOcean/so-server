@@ -1,4 +1,4 @@
-package com.sleepy.common.util;
+package com.sleepy.common.tools;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  * @author Captain
  * @create 2019-07-28 10:52
  */
-public class HttpUtil {
+public class HttpTools {
 
     public static final Integer HTTP_STATUS_OK = 200;
     public static final Integer HTTP_INTERNAL_SERVER_ERROR = 500;

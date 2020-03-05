@@ -1,4 +1,4 @@
-package com.sleepy.common.util;
+package com.sleepy.common.tools;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -10,7 +10,7 @@ import java.util.Date;
  * @author gehoubao
  * @create 2019-04-26 10:20
  **/
-public class DateUtil {
+public class DateTools {
     public static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd";
     public static final String DEFAULT_DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     public static final String FLYWAY_SQL_FILE_NAME_PATTERN = "yyyy.MM.dd_HHmm";

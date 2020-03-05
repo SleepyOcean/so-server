@@ -5,7 +5,7 @@ import com.sleepy.blog.entity.ProjectEntity;
 import com.sleepy.blog.repository.ProjectRepository;
 import com.sleepy.blog.service.ProjectService;
 import com.sleepy.blog.vo.ProjectVO;
-import com.sleepy.common.util.StringUtil;
+import com.sleepy.common.tools.StringTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,7 @@ public class ProjectServiceImpl implements ProjectService {
         entity.setCreateTime(vo.getCreateTime());
         entity.setUpdateTime(vo.getUpdateTime());
         entity.setStatus(vo.getStatus());
-        entity.setNote(StringUtil.isNullOrEmpty(vo.getNote()) ? "" : vo.getNote());
+        entity.setNote(StringTools.isNullOrEmpty(vo.getNote()) ? "" : vo.getNote());
         entity.setDeleteFlag(0);
         projectRepository.save(entity).toString();
         result.setResult("success");
@@ -47,14 +47,14 @@ public class ProjectServiceImpl implements ProjectService {
     public CommonDTO<ProjectEntity> getProject(ProjectVO vo) {
         CommonDTO<ProjectEntity> result = new CommonDTO<>();
         List<ProjectEntity> sets = new ArrayList<>();
-        if (!StringUtil.isNullOrEmpty(vo.getId())) {
+        if (!StringTools.isNullOrEmpty(vo.getId())) {
             Optional<ProjectEntity> set = projectRepository.findById(vo.getId());
             sets.add(set.get());
-        } else if (!StringUtil.isNullOrEmpty(vo.getProjectName())) {
+        } else if (!StringTools.isNullOrEmpty(vo.getProjectName())) {
             sets = projectRepository.findAllByProjectNameLike("%" + vo.getProjectName() + "%", Sort.by(Sort.Direction.DESC, "deadline"));
-        } else if (!StringUtil.isNullOrEmpty(vo.getModuleName())) {
+        } else if (!StringTools.isNullOrEmpty(vo.getModuleName())) {
             sets = projectRepository.findAllByModuleNameLike("%" + vo.getModuleName() + "%", Sort.by(Sort.Direction.DESC, "deadline"));
-        } else if (!StringUtil.isNullOrEmpty(vo.getDeadline())) {
+        } else if (!StringTools.isNullOrEmpty(vo.getDeadline())) {
             sets = projectRepository.findAllByDeadline(vo.getDeadline());
         } else if (null != vo.getStatus()) {
             sets = projectRepository.findAllByStatus(vo.getStatus(), Sort.by(Sort.Direction.DESC, "deadline"));
@@ -88,19 +88,19 @@ public class ProjectServiceImpl implements ProjectService {
         if (null != vo.getStatus()) {
             entity.get().setStatus(vo.getStatus());
         }
-        if (!StringUtil.isNullOrEmpty(vo.getProjectName())) {
+        if (!StringTools.isNullOrEmpty(vo.getProjectName())) {
             entity.get().setProjectName(vo.getProjectName());
         }
-        if (!StringUtil.isNullOrEmpty(vo.getModuleName())) {
+        if (!StringTools.isNullOrEmpty(vo.getModuleName())) {
             entity.get().setModuleName(vo.getModuleName());
         }
-        if (!StringUtil.isNullOrEmpty(vo.getDeadline())) {
+        if (!StringTools.isNullOrEmpty(vo.getDeadline())) {
             entity.get().setDeadline(vo.getDeadline());
         }
-        if (!StringUtil.isNullOrEmpty(vo.getNote())) {
+        if (!StringTools.isNullOrEmpty(vo.getNote())) {
             entity.get().setNote(vo.getNote());
         }
-        if (!StringUtil.isNullOrEmpty(vo.getUpdateTime())) {
+        if (!StringTools.isNullOrEmpty(vo.getUpdateTime())) {
             entity.get().setUpdateTime(vo.getUpdateTime());
         }
         projectRepository.saveAndFlush(entity.get());

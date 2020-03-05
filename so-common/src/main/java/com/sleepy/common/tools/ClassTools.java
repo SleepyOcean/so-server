@@ -1,4 +1,4 @@
-package com.sleepy.common.util;
+package com.sleepy.common.tools;
 
 /**
  * 类操作工具类
@@ -6,5 +6,5 @@ package com.sleepy.common.util;
  * @author gehoubao
  * @create 2019-07-09 14:18
  **/
-public class ClassUtil {
+public class ClassTools {
 }

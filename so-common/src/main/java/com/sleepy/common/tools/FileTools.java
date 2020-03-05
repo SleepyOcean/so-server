@@ -1,4 +1,4 @@
-package com.sleepy.common.util;
+package com.sleepy.common.tools;
 
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.metadata.Directory;
@@ -19,7 +19,7 @@ import java.util.Map;
  * @author gehoubao
  * @create 2019-04-26 10:16
  **/
-public class FileUtil {
+public class FileTools {
 
     public static String getProjectPath() throws IOException {
         File file = new File("");
@@ -131,24 +131,24 @@ public class FileUtil {
                         } else if ("Date/Time Original".equals(tagName)) {
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
                             Date date = sdf.parse(desc);
-                            metaInfo.put("拍照时间", DateUtil.dateFormat(date));
+                            metaInfo.put("拍照时间", DateTools.dateFormat(date));
                         } else if ("Date/Time".equals(tagName)) {
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
                             Date date = sdf.parse(desc);
-                            metaInfo.put("创建时间", DateUtil.dateFormat(date));
+                            metaInfo.put("创建时间", DateTools.dateFormat(date));
                         } else if ("Expected File Name Extension".equals(tagName)) {
                             metaInfo.put("图片格式", desc);
                         } else if ("File Size".equals(tagName)) {
-                            metaInfo.put("图片大小", StringUtil.getFormatFileSize(Double.parseDouble(desc.replaceAll("[^0-9]", "").trim())));
+                            metaInfo.put("图片大小", StringTools.getFormatFileSize(Double.parseDouble(desc.replaceAll("[^0-9]", "").trim())));
                         } else {
                             if ("Image Width".equals(tagName)) {
-                                metaInfo.put("宽", StringUtil.getIntegerNumFromString(desc));
+                                metaInfo.put("宽", StringTools.getIntegerNumFromString(desc));
                             } else if ("Image Height".equals(tagName)) {
-                                metaInfo.put("高", StringUtil.getIntegerNumFromString(desc));
+                                metaInfo.put("高", StringTools.getIntegerNumFromString(desc));
                             } else if ("X Resolution".equals(tagName)) {
-                                metaInfo.put("水平分辨率", StringUtil.getIntegerNumFromString(desc));
+                                metaInfo.put("水平分辨率", StringTools.getIntegerNumFromString(desc));
                             } else if ("Y Resolution".equals(tagName)) {
-                                metaInfo.put("垂直分辨率", StringUtil.getIntegerNumFromString(desc));
+                                metaInfo.put("垂直分辨率", StringTools.getIntegerNumFromString(desc));
                             }
                         }
                     }

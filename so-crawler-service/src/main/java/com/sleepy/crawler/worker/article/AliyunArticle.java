@@ -1,6 +1,6 @@
 package com.sleepy.crawler.worker.article;
 
-import com.sleepy.common.util.DateUtil;
+import com.sleepy.common.tools.DateTools;
 import com.sleepy.crawler.dto.ArticleDTO;
 import com.sleepy.crawler.dto.TransferDTO;
 import com.sleepy.crawler.worker.CrawlerWork;
@@ -33,7 +33,7 @@ public class AliyunArticle implements CrawlerWork {
             System.out.println(articleUrls.get(i));
             ArticleDTO entity = new ArticleDTO();
             entity.setTitle(articleDoc.getElementsByClass("blog-title").html());
-            entity.setCreateTime(DateUtil.toDate(articleDoc.getElementsByClass("b-time").html(), DateUtil.DEFAULT_DATETIME_PATTERN));
+            entity.setCreateTime(DateTools.toDate(articleDoc.getElementsByClass("b-time").html(), DateTools.DEFAULT_DATETIME_PATTERN));
             List<String> tags = articleDoc.getElementsByClass("label-item").stream().map(o -> o.getElementsByTag("span").html()).collect(Collectors.toList());
             StringBuilder tagStr = new StringBuilder();
             tags.forEach(o -> {

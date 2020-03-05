@@ -1,4 +1,4 @@
-package com.sleepy.common.util;
+package com.sleepy.common.tools;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  * @author gehoubao
  * @create 2019-04-25 13:44
  **/
-public class StringUtil {
+public class StringTools {
     public static final String QUESTION_MARK = "?";
     public static final String POINT = ".";
     public static final String AND = "&";
@@ -132,7 +132,7 @@ public class StringUtil {
      */
     public static int getIntegerNumFromString(String numStr) {
         String trimStr = numStr.replaceAll("[^0-9]", "").trim();
-        int value = Integer.parseInt(StringUtil.isNullOrEmpty(trimStr) ? "0" : trimStr);
+        int value = Integer.parseInt(StringTools.isNullOrEmpty(trimStr) ? "0" : trimStr);
         return value;
     }
 
@@ -149,5 +149,21 @@ public class StringUtil {
             s.append(random.nextInt(9));
         }
         return s.toString();
+    }
+
+    /**
+     * 使用符号拼接多个字符串
+     *
+     * @param splitSymbol
+     * @param strings
+     * @return
+     */
+    public static String getSplitString(String splitSymbol, String... strings) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < strings.length; i++) {
+            sb.append(strings[i]);
+            sb.append(splitSymbol);
+        }
+        return sb.substring(0, sb.length() - 1);
     }
 }

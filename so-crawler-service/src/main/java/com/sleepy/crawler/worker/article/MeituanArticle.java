@@ -1,6 +1,6 @@
 package com.sleepy.crawler.worker.article;
 
-import com.sleepy.common.util.DateUtil;
+import com.sleepy.common.tools.DateTools;
 import com.sleepy.crawler.dto.ArticleDTO;
 import com.sleepy.crawler.dto.TransferDTO;
 import com.sleepy.crawler.worker.CrawlerWork;
@@ -42,7 +42,7 @@ public class MeituanArticle implements CrawlerWork {
                 createTime.append("-");
                 createTime.append(dateStrs[2]);
                 createTime.append(" 00:00:00");
-                entity.setCreateTime(DateUtil.toDate(createTime.toString(), DateUtil.DEFAULT_DATETIME_PATTERN));
+                entity.setCreateTime(DateTools.toDate(createTime.toString(), DateTools.DEFAULT_DATETIME_PATTERN));
                 String[] tags = articleDoc.getElementsByClass("tag-links").stream().map(o -> o.getElementsByTag("a").html()).collect(Collectors.toList()).get(0).split("\n");
                 StringBuilder tagStr = new StringBuilder();
                 for (String o : tags) {

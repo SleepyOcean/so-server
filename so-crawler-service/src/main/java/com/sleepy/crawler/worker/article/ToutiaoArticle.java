@@ -3,9 +3,9 @@ package com.sleepy.crawler.worker.article;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.sleepy.common.util.DateUtil;
-import com.sleepy.common.util.FileUtil;
-import com.sleepy.common.util.HttpUtil;
+import com.sleepy.common.tools.DateTools;
+import com.sleepy.common.tools.FileTools;
+import com.sleepy.common.tools.HttpTools;
 import com.sleepy.crawler.dto.ArticleDTO;
 import com.sleepy.crawler.dto.TransferDTO;
 import com.sleepy.crawler.worker.CrawlerWork;
@@ -30,7 +30,7 @@ public class ToutiaoArticle implements CrawlerWork {
     @Override
     public List<TransferDTO> produce() throws IOException {
         List<TransferDTO> articles = new ArrayList<>();
-        String html = FileUtil.readToString("E:\\Code\\Web\\source\\all\\沉睡的海洋的头条主页 - 今日头条(www.toutiao.com).html");
+        String html = FileTools.readToString("E:\\Code\\Web\\source\\all\\沉睡的海洋的头条主页 - 今日头条(www.toutiao.com).html");
         Document doc = Jsoup.parse(html);
         List<String> articleUrls = doc.getElementsByClass("lbox")
                 .stream().map(o -> o.getElementsByTag("a").get(0).attr("href").replace("https://www.toutiao.com/item/", "https://www.toutiao.com/i")).collect(Collectors.toList());
@@ -38,7 +38,7 @@ public class ToutiaoArticle implements CrawlerWork {
         for (int i = 0; i < articleUrls.size(); i++) {
             Document articleDoc;
             try {
-                articleDoc = HttpUtil.getHtmlPageResponseAsDocument(articleUrls.get(i));
+                articleDoc = HttpTools.getHtmlPageResponseAsDocument(articleUrls.get(i));
             } catch (Exception e) {
                 log.error("访问头条失败： " + e.getMessage());
                 continue;
@@ -58,7 +58,7 @@ public class ToutiaoArticle implements CrawlerWork {
             ArticleDTO entity = new ArticleDTO();
             entity.setCoverImg(articleObject.getJSONObject("articleInfo").getString("coverImg"));
             entity.setTitle(title.substring(1, title.length() - 1));
-            entity.setCreateTime(DateUtil.toDate(articleObject.getJSONObject("articleInfo").getJSONObject("subInfo").getString("time"), DateUtil.DEFAULT_DATETIME_PATTERN));
+            entity.setCreateTime(DateTools.toDate(articleObject.getJSONObject("articleInfo").getJSONObject("subInfo").getString("time"), DateTools.DEFAULT_DATETIME_PATTERN));
             JSONArray tagsArray = articleObject.getJSONObject("articleInfo").getJSONObject("tagInfo").getJSONArray("tags");
             StringBuilder tagStr = new StringBuilder();
             for (int j = 0; j < tagsArray.size(); j++) {

@@ -4,7 +4,7 @@ import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.blog.entity.SettingEntity;
 import com.sleepy.blog.service.SettingService;
 import com.sleepy.blog.vo.SettingVO;
-import com.sleepy.common.util.StringUtil;
+import com.sleepy.common.tools.StringTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +29,7 @@ public class SettingController {
 
     @PostMapping("/get")
     public CommonDTO<SettingEntity> get(@RequestBody SettingVO vo) {
-        if (StringUtil.isNullOrEmpty(vo.getId())) {
+        if (StringTools.isNullOrEmpty(vo.getId())) {
             return settingService.findAllSetting(vo);
         } else {
             return settingService.findSetting(vo);
