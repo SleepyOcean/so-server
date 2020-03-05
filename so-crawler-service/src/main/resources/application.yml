@@ -1,0 +1,11 @@
+server:
+  port: 9900
+  tomcat:
+    uri-encoding: UTF-8
+
+logging:
+  level:
+    # 全局等级
+    root: warn
+    com:
+      sleepy: info
