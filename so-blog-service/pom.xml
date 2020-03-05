@@ -26,8 +26,8 @@
 
         <dependency>
             <groupId>com.sleepy</groupId>
-            <artifactId>so-jpql-core</artifactId>
-            <version>${project.version}</version>
+            <artifactId>so-jpql-template-engine</artifactId>
+            <version>1.0.1.RELEASE</version>
         </dependency>
 
         <dependency>
@@ -73,6 +73,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
+        <finalName>blog-server</finalName>
     </build>
 
 </project>
