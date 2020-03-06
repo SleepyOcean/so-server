@@ -45,6 +45,54 @@ public class FileTools {
         }
     }
 
+    public static void writeToString(String filePath, String content) {
+        StringWriter sw = new StringWriter(filePath);
+        sw.writeStringToFile(content);
+        sw.close();
+    }
+
+    /**
+     * 根据传入的名称生成Controller、service和serviceImpl文件
+     *
+     * @param distPath
+     * @param mvcName
+     */
+    public static void generateMVCCodeFile(String distPath, String packagePath, String mvcName) {
+        String controllerFile = distPath + File.separator + "controller" + File.separator + mvcName + "Controller.java";
+        String serviceFile = distPath + File.separator + "service" + File.separator + mvcName + "Service.java";
+        String serviceImplFile = distPath + File.separator + "service" + File.separator + "impl" + File.separator + mvcName + "ServiceImpl.java";
+        String notes = "/**\n" +
+                " * @author SleepyOcean\n" +
+                " * @create " + DateTools.dateFormat(new Date()) + "\n" +
+                " */\n";
+        StringBuilder controllerTemplate = new StringBuilder();
+        StringBuilder serviceTemplate = new StringBuilder();
+        StringBuilder serviceImplTemplate = new StringBuilder();
+        controllerTemplate.append("package " + packagePath + ".controller;\n")
+                .append("import " + packagePath + ".service." + mvcName + "Service;\n" +
+                        "import org.springframework.beans.factory.annotation.Autowired;\n" +
+                        "import org.springframework.web.bind.annotation.*;\n").append(notes)
+                .append("@RestController\n" +
+                        "@CrossOrigin\n" +
+                        "@RequestMapping(\"\")\n")
+                .append("public class " + mvcName + "Controller {\n" +
+                        "    @Autowired\n" +
+                        "    " + mvcName + "Service " + mvcName.toLowerCase() + "Service;\n" +
+                        "}");
+        serviceTemplate.append("package " + packagePath + ".service;\n").append(notes)
+                .append("public interface " + mvcName + "Service {}");
+        serviceImplTemplate.append("package " + packagePath + ".service.impl;\n")
+                .append("import " + packagePath + ".service." + mvcName + "Service;\n" +
+                        "import lombok.extern.slf4j.Slf4j;\n" +
+                        "import org.springframework.stereotype.Service;\n").append(notes)
+                .append("@Service\n" +
+                        "@Slf4j\n")
+                .append("public class " + mvcName + "ServiceImpl implements " + mvcName + "Service {}");
+        writeToString(controllerFile, controllerTemplate.toString());
+        writeToString(serviceFile, serviceTemplate.toString());
+        writeToString(serviceImplFile, serviceImplTemplate.toString());
+    }
+
     /**
      * 文本写入文件操作类
      */
@@ -245,4 +293,7 @@ public class FileTools {
         }
     }
 
+    public static void main(String[] args) {
+        generateMVCCodeFile("E:\\MicroProjects\\so-server\\so-file-system\\src\\main\\java\\com\\sleepy\\file\\", "com.sleepy.file", "Image");
+    }
 }
