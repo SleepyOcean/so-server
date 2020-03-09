@@ -20,7 +20,7 @@
     <modules>
         <module>so-common</module>
         <module>so-blog-service</module>
-        <module>so-file-system</module>
+        <module>so-file-system-service</module>
         <module>so-security-starter</module>
     </modules>
 

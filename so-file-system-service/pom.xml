@@ -8,7 +8,7 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>so-file-system</artifactId>
+    <artifactId>so-file-system-service</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
