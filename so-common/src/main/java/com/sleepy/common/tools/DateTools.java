@@ -14,6 +14,7 @@ public class DateTools {
     public static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd";
     public static final String DEFAULT_DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     public static final String FLYWAY_SQL_FILE_NAME_PATTERN = "yyyy.MM.dd_HHmm";
+    public static final String CUSTOM_DATETIME_PATTERN = "yyyyMMddHHmmss";
 
     /**
      * 指定格式，格式化日期

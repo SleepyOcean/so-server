@@ -7,10 +7,11 @@ import com.sleepy.common.tools.FileTools;
 import com.sleepy.common.tools.ImageTools;
 import com.sleepy.common.tools.StringTools;
 import com.sleepy.file.common.Constant;
-import com.sleepy.file.entity.ImageEntity;
-import com.sleepy.file.repository.ImageRepository;
+import com.sleepy.file.dao.ImageDAO;
+import com.sleepy.file.dto.ImageDTO;
 import com.sleepy.file.service.ImageService;
 import com.sleepy.file.vo.ImageVO;
+import com.sleepy.file.vo.ImgSearchVO;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +37,8 @@ import java.util.Map;
 public class ImageServiceImpl implements ImageService {
 
     @Autowired
-    ImageRepository imageRepository;
+    ImageDAO imageDAO;
+
     @Value("${imgDir}")
     private String imgDir;
 
@@ -47,7 +48,7 @@ public class ImageServiceImpl implements ImageService {
         if (id.contains(StringTools.POINT)) {
             imgPath = imgDir + "resource" + File.separator + id;
         } else {
-            imgPath = imgDir + imageRepository.findLocalPathById(id);
+            imgPath = imgDir + imageDAO.findLocalPathById(id);
         }
         File file = new File(imgPath);
         FileInputStream inputStream = new FileInputStream(file);
@@ -91,43 +92,50 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
+    public Map<String, Object> search(ImgSearchVO vo) throws IOException {
+        return imageDAO.search(vo);
+    }
+
+    @Override
     public String upload(ImageVO vo) throws IOException {
-        ImageEntity entity = JSON.parseObject(JSON.toJSONString(vo), ImageEntity.class);
-        Date current = DateTools.getDateWithCurrent(0, Calendar.DAY_OF_YEAR);
+        ImageDTO entity = JSON.parseObject(JSON.toJSONString(vo), ImageDTO.class);
+        String imageId;
+        String currentDay = DateTools.dateFormat(new Date(), DateTools.DEFAULT_DATE_PATTERN);
+        String currentTime = DateTools.dateFormat(new Date());
         if (StringTools.isNullOrEmpty(entity.getType())) {
             entity.setType(Constant.IMG_TYPE_OTHERS);
         }
         // 图片名称的路径： 图片的类型/图片上传日期/图片的UUID， 例如： 封面/2019-10-31/2fc9e266e21f4fe18f92da2fc56567f8
-        String randomName = entity.getType() + File.separator + DateTools.dateFormat(current, DateTools.DEFAULT_DATE_PATTERN) + File.separator + StringTools.getRandomUuid("");
+        String randomName = entity.getType() + File.separator + currentDay + File.separator + StringTools.getRandomUuid("");
         String imgPath = ImageTools.base64ToImgFile(vo.getImgOfBase64(), imgDir + randomName);
         try {
             FileTools.ImgMetaHolder imgMetaHolder = new FileTools.ImgMetaHolder(imgPath);
             Map imgMeta = imgMetaHolder.getMetaInfo();
-            entity.setUploadTime(current);
+            entity.setUploadTime(currentTime);
             entity.setPath(imgPath.substring(imgDir.length()));
-            entity.setCreateTime(imgMeta.get("创建时间") != null ? DateTools.toDate(imgMeta.get("创建时间").toString(), DateTools.DEFAULT_DATETIME_PATTERN) : current);
+            entity.setCreateTime(imgMeta.get("创建时间") != null ? imgMeta.get("创建时间").toString() : currentTime);
             entity.setImgSize(imgMeta.get("图片大小").toString());
             entity.setImgFormat(imgMeta.get("图片格式").toString());
             entity.setResolutionRatio(imgMeta.get("宽") + " × " + imgMeta.get("高"));
-            entity = imageRepository.save(entity);
+            imageId = imageDAO.save(entity);
         } catch (Exception e) {
             File file = new File(imgPath);
             file.delete();
             throw e;
         }
         Map<String, Object> result = new HashMap<>(2);
-        result.put("id", entity.getId());
-        result.put("url", Constant.IMG_SERVER_URL_PLACEHOLDER + entity.getId());
+        result.put("id", imageId);
+        result.put("url", Constant.IMG_SERVER_URL_PLACEHOLDER + imageId);
         return new JSONObject(result).toJSONString();
     }
 
     @Override
-    public String delete(ImageVO vo) {
-        if (!StringTools.isNullOrEmpty(vo.getId())) {
-            String imgPath = imgDir + imageRepository.findLocalPathById(vo.getId());
+    public String delete(ImageVO vo) throws IOException {
+        if (!StringTools.isNullOrEmpty(vo.getImageId())) {
+            String imgPath = imgDir + imageDAO.findLocalPathById(vo.getImageId());
             File file = new File(imgPath);
             file.delete();
-            imageRepository.deleteById(vo.getId());
+            imageDAO.deleteById(vo.getImageId());
         }
         return "success";
     }

@@ -1,9 +1,11 @@
 package com.sleepy.file.service;
 
 import com.sleepy.file.vo.ImageVO;
+import com.sleepy.file.vo.ImgSearchVO;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author SleepyOcean
@@ -39,6 +41,14 @@ public interface ImageService {
     void compressImg(HttpServletResponse response, String ratio, String url);
 
     /**
+     * 搜索图片
+     *
+     * @param vo
+     * @return
+     */
+    Map<String, Object> search(ImgSearchVO vo) throws IOException;
+
+    /**
      * 上传图片
      *
      * @param vo
@@ -53,5 +63,5 @@ public interface ImageService {
      * @param vo
      * @return
      */
-    String delete(ImageVO vo);
+    String delete(ImageVO vo) throws IOException;
 }

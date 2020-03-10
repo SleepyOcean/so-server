@@ -2,6 +2,7 @@ package com.sleepy.file.controller;
 
 import com.sleepy.file.service.ImageService;
 import com.sleepy.file.vo.ImageVO;
+import com.sleepy.file.vo.ImgSearchVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * 图片服务
@@ -38,6 +40,12 @@ public class ImageController {
     @GetMapping("/compress")
     public void getCompressedImage(HttpServletResponse response, @RequestParam("ratio") String ratio, @RequestParam("url") String url) {
         imageService.compressImg(response, ratio, url);
+    }
+
+    @PostMapping("/search")
+    @ResponseBody
+    public Map<String, Object> search(@RequestBody ImgSearchVO vo) throws IOException {
+        return imageService.search(vo);
     }
 
     /**
