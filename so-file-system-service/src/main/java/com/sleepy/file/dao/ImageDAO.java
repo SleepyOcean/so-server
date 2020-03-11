@@ -13,6 +13,7 @@ import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -59,6 +60,7 @@ public class ImageDAO {
 
     public Map<String, Object> search(ImgSearchVO vo) throws IOException {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.sort("uploadTime", SortOrder.DESC);
         Search search = new Search.Builder(searchSourceBuilder.toString()).addIndex(ES_SO_IMAGE_STORE_INDEX).addType("image").build();
         JestResult jestResult = jestClient.execute(search);
         List<ImageDTO> data = ((SearchResult) jestResult).getHits(ImageDTO.class).stream().map(p -> p.source).collect(Collectors.toList());

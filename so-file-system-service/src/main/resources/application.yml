@@ -8,7 +8,7 @@ spring:
     jest:
       connection-timeout: 30000
       multi-threaded: true
-      uris: http://192.168.88.128:9200
+      uris: http://es.sleepyocean.cn
       read-timeout: 7200
   servlet:
     multipart:
