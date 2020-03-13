@@ -103,7 +103,7 @@ public class ImageServiceImpl implements ImageService {
         String currentDay = DateTools.dateFormat(new Date(), DateTools.DEFAULT_DATE_PATTERN);
         String currentTime = DateTools.dateFormat(new Date());
         if (StringTools.isNullOrEmpty(entity.getType())) {
-            entity.setType(Constant.IMG_TYPE_OTHERS);
+            entity.setType(Constant.IMG_TYPE_GALLERY);
         }
         // 图片名称的路径： 图片的类型/图片上传日期/图片的UUID， 例如： 封面/2019-10-31/2fc9e266e21f4fe18f92da2fc56567f8
         String randomName = entity.getType() + File.separator + currentDay + File.separator + StringTools.getRandomUuid("");
