@@ -26,11 +26,6 @@ import java.util.Map;
 @Slf4j
 public class ExcelTools {
 
-    public static void main(String[] args) {
-        Map<String, List<List<String>>> result = readExcelByString("E:\\MicroProjects\\assets\\商品导入模板V1.1(1)(1).xls");
-        System.out.println(result);
-    }
-
     /**
      * 通过String类,读取工作表数据
      *

@@ -1,6 +1,8 @@
 package com.sleepy.crawler.worker.custom;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.sleepy.common.tools.ExcelTools;
 import com.sleepy.common.tools.FileTools;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,7 +17,11 @@ import java.util.*;
  **/
 public class GoodsInfo {
 
-    private void getContentFromTianmao() throws Exception {
+    public static void main(String[] args) throws Exception {
+        new GoodsInfo().getGoodsListFromExcel("E:\\MicroProjects\\assets\\商品导入模板V2.0.xlsx");
+    }
+
+    private void getContentFromTianMall() throws Exception {
         String html = FileTools.readToString("E:\\Code\\\\resuource\\天猫美食-喵鲜生-理想生活上天猫.html");
         Document doc = Jsoup.parse(html);
         Map<String, Object> res = new HashMap<>();
@@ -66,7 +72,38 @@ public class GoodsInfo {
         System.out.println(JSON.toJSON(res).toString());
     }
 
-    public static void main(String[] args) throws Exception {
-        new GoodsInfo().getContentFromTianmao();
+    private void getGoodsListFromExcel(String path) {
+        Map<String, List<List<String>>> result = ExcelTools.readExcelByString("E:\\MicroProjects\\assets\\商品导入模板V1.1(1)(1).xls");
+        List<Object> list = (List<Object>) result.values().toArray()[0];
+        Map<String, Object> res = new HashMap<>(4);
+        List<Object> array = new ArrayList<>();
+        for (int i = 5; i < list.size() - 1; i++) {
+            List<String> originGoods = (List<String>) list.get(i);
+            Map<String, Object> item = new HashMap<>(8);
+//            item.put("goodsName", "".equalsIgnoreCase(imgAlt) ? goodsName : imgAlt);
+//            item.put("goodsPriceOrigin", oldPrice);
+//            item.put("goodsPriceNow", nowPrice);
+//            item.put("imgUrl", imgUrl);
+//            item.put("detailImgUrl", imgUrl);
+//            item.put("storageNum", (new Random()).nextInt(1000));
+//            item.put("goodsDesc", "".equalsIgnoreCase(imgAlt) ? goodsName : imgAlt + "  " + goodsName);
+//            item.put("category", (new Random()).nextInt(7) + 1);
+            array.add(item);
+        }
+
+        res.put("goods", array);
+        System.out.println(JSON.toJSON(res).toString());
+    }
+
+    private void writeGoodsListToExcel(String path) {
+        Map<String, List<List<String>>> result = ExcelTools.readExcelByString("E:\\MicroProjects\\assets\\商品导入模板V2.0.xlsx");
+        List<JSONObject> data = new ArrayList<>();
+        List<List<String>> list = result.get("模板");
+        data.forEach(d -> {
+            List<String> item = new ArrayList<>();
+            item.set(3, d.get("商品名称").toString());
+            list.add(item);
+        });
+        ExcelTools.writeExcelByString("E:\\MicroProjects\\assets\\商品导入模板V3.0.xlsx", result);
     }
 }
