@@ -17,13 +17,3 @@ docker rm fileserver
 docker rmi fileserver
 docker build -f ./so-file-system-service/Dockerfile -t fileserver .
 docker run -d -p 9020:9020 --privileged=true --name fileserver -v /ocean/server_data/fileserver:/ocean/server_data -e "TZ=Asia/Shanghai" fileserver
-
-
-docker start mysql
-mvn clean install -DskipTests
-mv ./so-blog-service/target/blog-server.jar ./
-docker stop blogserver
-docker rm blogserver
-docker rmi blogserver
-docker build -t blogserver .
-docker run -d -p 9999:9999 --name blogserver -v /home/sleepy/res/ImageServer:/ImageServer blogserver

@@ -61,9 +61,12 @@ public class ImageDAO {
     public Map<String, Object> search(ImgSearchVO vo) throws IOException {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.sort("uploadTime", SortOrder.DESC);
+        searchSourceBuilder.from(vo.getPageStart());
+        searchSourceBuilder.size(vo.getPageSize());
         Search search = new Search.Builder(searchSourceBuilder.toString()).addIndex(ES_SO_IMAGE_STORE_INDEX).addType("image").build();
         JestResult jestResult = jestClient.execute(search);
         List<ImageDTO> data = ((SearchResult) jestResult).getHits(ImageDTO.class).stream().map(p -> p.source).collect(Collectors.toList());
-        return CommonTools.getCustomMap(new MapModel("list", data));
+        long total = ((SearchResult) jestResult).getTotal();
+        return CommonTools.getCustomMap(new MapModel("list", data), new MapModel("total", total));
     }
 }
