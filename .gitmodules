@@ -1,0 +1,4 @@
+[submodule "so-jpql-template-engine"]
+	path = so-jpql-template-engine
+	url = E:\\MicroProjects\\so-server\\so-jpql-template-engine
+	branch = master
