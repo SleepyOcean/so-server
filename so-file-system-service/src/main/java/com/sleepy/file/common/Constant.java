@@ -14,5 +14,6 @@ public class Constant {
     public static final String IMG_TYPE_PHOTO = "照片";
     public static final String IMG_TYPE_COVER = "封面";
     public static final String IMG_TYPE_OTHERS = "其他";
+    public static final String IMG_TYPE_GALLERY = "Gallery";
     public static final String IMG_TYPE_WALLPAPER = "壁纸";
 }
