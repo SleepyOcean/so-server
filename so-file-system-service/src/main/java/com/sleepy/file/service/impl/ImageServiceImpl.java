@@ -24,9 +24,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author SleepyOcean
@@ -48,7 +46,12 @@ public class ImageServiceImpl implements ImageService {
         if (id.contains(StringTools.POINT)) {
             imgPath = imgDir + "resource" + File.separator + id;
         } else {
-            imgPath = imgDir + imageDAO.findLocalPathById(id);
+            String imgName = imageDAO.findLocalPathById(id);
+            if (StringTools.isNotNullOrEmpty(imgName)) {
+                imgPath = imgDir + imgName;
+            } else {
+                return new byte[0];
+            }
         }
         File file = new File(imgPath);
         FileInputStream inputStream = new FileInputStream(file);
@@ -98,30 +101,42 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public String upload(ImageVO vo) throws IOException {
-        ImageDTO entity = JSON.parseObject(JSON.toJSONString(vo), ImageDTO.class);
         String imageId;
-        String currentDay = DateTools.dateFormat(new Date(), DateTools.DEFAULT_DATE_PATTERN);
-        String currentTime = DateTools.dateFormat(new Date());
-        if (StringTools.isNullOrEmpty(entity.getType())) {
-            entity.setType(Constant.IMG_TYPE_GALLERY);
-        }
-        // 图片名称的路径： 图片的类型/图片上传日期/图片的UUID， 例如： 封面/2019-10-31/2fc9e266e21f4fe18f92da2fc56567f8
-        String randomName = entity.getType() + File.separator + currentDay + File.separator + StringTools.getRandomUuid("");
-        String imgPath = ImageTools.base64ToImgFile(vo.getImgOfBase64(), imgDir + randomName);
-        try {
-            FileTools.ImgMetaHolder imgMetaHolder = new FileTools.ImgMetaHolder(imgPath);
-            Map imgMeta = imgMetaHolder.getMetaInfo();
-            entity.setUploadTime(currentTime);
-            entity.setPath(imgPath.substring(imgDir.length()));
-            entity.setCreateTime(imgMeta.get("创建时间") != null ? imgMeta.get("创建时间").toString() : currentTime);
-            entity.setImgSize(imgMeta.get("图片大小").toString());
-            entity.setImgFormat(imgMeta.get("图片格式").toString());
-            entity.setResolutionRatio(imgMeta.get("宽") + " × " + imgMeta.get("高"));
-            imageId = imageDAO.save(entity);
-        } catch (Exception e) {
-            File file = new File(imgPath);
-            file.delete();
-            throw e;
+        String md5 = FileTools.getStringMD5(vo.getImgOfBase64());
+        imageId = md5;
+        if (StringTools.isNullOrEmpty(imageDAO.findLocalPathById(md5))) {
+            ImageDTO entity = JSON.parseObject(JSON.toJSONString(vo), ImageDTO.class);
+            String currentDay = DateTools.dateFormat(new Date(), DateTools.DEFAULT_DATE_PATTERN);
+            String currentTime = DateTools.dateFormat(new Date());
+            if (StringTools.isNullOrEmpty(entity.getType())) {
+                entity.setType(Constant.IMG_TYPE_GALLERY);
+            }
+            // 图片名称的路径： 图片的类型/图片上传日期/图片的UUID， 例如： 封面/2019-10-31/2fc9e266e21f4fe18f92da2fc56567f8
+            String randomName = entity.getType() + File.separator + currentDay + File.separator + StringTools.getRandomUuid("");
+            String imgPath = ImageTools.base64ToImgFile(vo.getImgOfBase64(), imgDir + randomName);
+
+            try {
+                FileTools.ImgMetaHolder imgMetaHolder = new FileTools.ImgMetaHolder(imgPath);
+                Map imgMeta = imgMetaHolder.getMetaInfo();
+                if (StringTools.isNotNullOrEmpty(vo.getAlias())) {
+                    entity.setAlias(vo.getAlias());
+                }
+                if (StringTools.isNotNullOrEmpty(vo.getDescribeInfo())) {
+                    entity.setDescribeInfo(vo.getDescribeInfo());
+                }
+                entity.setUploadTime(currentTime);
+                entity.setPath(imgPath.substring(imgDir.length()));
+                entity.setCreateTime(imgMeta.get("创建时间") != null ? imgMeta.get("创建时间").toString() : currentTime);
+                entity.setImgSize(imgMeta.get("图片大小").toString());
+                entity.setImgFormat(imgMeta.get("图片格式").toString());
+                entity.setResolutionRatio(imgMeta.get("宽") + " × " + imgMeta.get("高"));
+                entity.setImageId(imageId);
+                imageDAO.save(entity);
+            } catch (Exception e) {
+                File file = new File(imgPath);
+                file.delete();
+                throw e;
+            }
         }
         Map<String, Object> result = new HashMap<>(2);
         result.put("id", imageId);
@@ -132,11 +147,33 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public String delete(ImageVO vo) throws IOException {
         if (!StringTools.isNullOrEmpty(vo.getImageId())) {
-            String imgPath = imgDir + imageDAO.findLocalPathById(vo.getImageId());
-            File file = new File(imgPath);
-            file.delete();
-            imageDAO.deleteById(vo.getImageId());
+            deleteSingleImg(vo.getImageId());
+        }
+        if (vo.getImgIds() != null && vo.getImgIds().size() > 0) {
+            batchDeleteImg(vo.getImgIds());
         }
         return "success";
     }
+
+    private void deleteSingleImg(String imgId) throws IOException {
+        String imgPath = imgDir + imageDAO.findLocalPathById(imgId);
+        File file = new File(imgPath);
+        if (file.exists()) {
+            file.delete();
+        }
+        imageDAO.deleteByIds(Arrays.asList(imgId));
+    }
+
+    private void batchDeleteImg(List<String> imgIds) throws IOException {
+        List<String> localPaths = imageDAO.findLocalPathByIds(imgIds);
+        localPaths.forEach(path -> {
+            String imgPath = imgDir + path;
+            File file = new File(imgPath);
+            if (file.exists()) {
+                file.delete();
+            }
+        });
+        imageDAO.deleteByIds(imgIds);
+    }
+
 }

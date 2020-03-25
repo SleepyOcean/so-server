@@ -4,6 +4,7 @@ import com.sleepy.file.dto.ImageDTO;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
 
 /**
  * 图片VO
@@ -17,4 +18,6 @@ public class ImageVO extends ImageDTO {
 
     @NotEmpty(message = "请输入editCode")
     private String editCode;
+
+    private List<String> imgIds;
 }
