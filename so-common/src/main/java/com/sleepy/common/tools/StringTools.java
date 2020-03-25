@@ -48,6 +48,16 @@ public class StringTools {
     }
 
     /**
+     * 判断字符串是否不为空
+     *
+     * @param string
+     * @return
+     */
+    public static boolean isNotNullOrEmpty(String string) {
+        return !isNullOrEmpty(string);
+    }
+
+    /**
      * 美化json字符串
      *
      * @param json
@@ -165,5 +175,12 @@ public class StringTools {
             sb.append(splitSymbol);
         }
         return sb.substring(0, sb.length() - 1);
+    }
+
+    public static String replaceIgnoreCase(String source, String reg, String replacement) {
+        Pattern p = Pattern.compile(reg, Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(source);
+        String r = m.replaceAll(replacement);
+        return r;
     }
 }

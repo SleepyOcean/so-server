@@ -6,6 +6,7 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -291,6 +292,20 @@ public class FileTools {
         public Map<String, Object> getMetaInfo() {
             return metaInfo;
         }
+    }
+
+    /**
+     * 获取字符串的 md5Hash
+     *
+     * @param str
+     * @return
+     */
+    public static String getStringMD5(String str) {
+        return DigestUtils.md5Hex(str);
+    }
+
+    public static String getFileMD5(String path) {
+        return "";
     }
 
     public static void main(String[] args) {
