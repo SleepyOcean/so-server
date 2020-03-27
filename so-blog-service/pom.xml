@@ -27,7 +27,7 @@
         <dependency>
             <groupId>com.sleepy</groupId>
             <artifactId>so-jpql-template-engine</artifactId>
-            <version>${project.version}</version>
+            <version>1.0.2.RELEASE</version>
         </dependency>
 
         <dependency>
