@@ -54,6 +54,9 @@ public class ImageServiceImpl implements ImageService {
             }
         }
         File file = new File(imgPath);
+        if (!file.exists()) {
+            return new byte[0];
+        }
         FileInputStream inputStream = new FileInputStream(file);
         byte[] bytes = new byte[inputStream.available()];
         inputStream.read(bytes, 0, inputStream.available());
@@ -157,15 +160,16 @@ public class ImageServiceImpl implements ImageService {
 
     private void deleteSingleImg(String imgId) throws IOException {
         String imgPath = imgDir + imageDAO.findLocalPathById(imgId);
+        imageDAO.deleteByIds(Arrays.asList(imgId));
         File file = new File(imgPath);
         if (file.exists()) {
             file.delete();
         }
-        imageDAO.deleteByIds(Arrays.asList(imgId));
     }
 
     private void batchDeleteImg(List<String> imgIds) throws IOException {
         List<String> localPaths = imageDAO.findLocalPathByIds(imgIds);
+        imageDAO.deleteByIds(imgIds);
         localPaths.forEach(path -> {
             String imgPath = imgDir + path;
             File file = new File(imgPath);
@@ -173,7 +177,6 @@ public class ImageServiceImpl implements ImageService {
                 file.delete();
             }
         });
-        imageDAO.deleteByIds(imgIds);
     }
 
 }
