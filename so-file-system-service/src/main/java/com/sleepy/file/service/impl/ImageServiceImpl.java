@@ -2,6 +2,7 @@ package com.sleepy.file.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.sleepy.common.constant.HttpStatusCode;
 import com.sleepy.common.tools.DateTools;
 import com.sleepy.common.tools.FileTools;
 import com.sleepy.common.tools.ImageTools;
@@ -107,6 +108,7 @@ public class ImageServiceImpl implements ImageService {
         String imageId;
         String md5 = FileTools.getStringMD5(vo.getImgOfBase64());
         imageId = md5;
+        Map<String, Object> result = new HashMap<>(4);
         if (StringTools.isNullOrEmpty(imageDAO.findLocalPathById(md5))) {
             ImageDTO entity = JSON.parseObject(JSON.toJSONString(vo), ImageDTO.class);
             String currentDay = DateTools.dateFormat(new Date(), DateTools.DEFAULT_DATE_PATTERN);
@@ -135,13 +137,17 @@ public class ImageServiceImpl implements ImageService {
                 entity.setResolutionRatio(imgMeta.get("宽") + " × " + imgMeta.get("高"));
                 entity.setImageId(imageId);
                 imageDAO.save(entity);
+                result.put("status", HttpStatusCode.OK);
             } catch (Exception e) {
                 File file = new File(imgPath);
                 file.delete();
-                throw e;
+                result.put("status", HttpStatusCode.INTERNAL_SERVER_ERROR);
+                result.put("message", e.getMessage());
+                return new JSONObject(result).toJSONString();
             }
+        } else {
+            result.put("status", HttpStatusCode.NOT_ACCEPTABLE);
         }
-        Map<String, Object> result = new HashMap<>(2);
         result.put("id", imageId);
         result.put("url", Constant.IMG_SERVER_URL_PLACEHOLDER + imageId);
         return new JSONObject(result).toJSONString();
