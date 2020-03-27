@@ -24,10 +24,10 @@ public class ArticleEntity {
     @Column(length = 32)
     private String id;
 
-    @Column(name = "title", columnDefinition = "VARCHAR(255) COMMENT '博客标题'")
+    @Column(name = "title", columnDefinition = "VARCHAR(255) COMMENT '博文标题'")
     private String title;
 
-    @Column(name = "summary", columnDefinition = "VARCHAR(1024) COMMENT '博客标题'")
+    @Column(name = "summary", columnDefinition = "VARCHAR(1024) COMMENT '博文概要'")
     private String summary;
 
     @Column(name = "content", columnDefinition = "LONGTEXT COMMENT '博文内容'")
