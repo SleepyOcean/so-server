@@ -21,6 +21,7 @@ public class CommonUtil {
     public static String CATEGORY_AUDIO = "audio";
     public static String CATEGORY_VIDEO = "video";
     public static String CATEGORY_IMAGE = "image";
+    public static String CATEGORY_HTML = ".html";
     public static String CATEGORY_OTHER = "other";
     public static List<String> AUDIO_SUFFIX_SET;
     public static List<String> VIDEO_SUFFIX_SET;
@@ -41,6 +42,9 @@ public class CommonUtil {
         }
         if (IMAGE_SUFFIX_SET.contains(suffix)) {
             return CATEGORY_IMAGE;
+        }
+        if (CATEGORY_HTML.equals(suffix)) {
+            return CATEGORY_HTML;
         }
         return CATEGORY_OTHER;
     }

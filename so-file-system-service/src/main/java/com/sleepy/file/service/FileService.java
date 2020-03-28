@@ -56,4 +56,23 @@ public interface FileService {
      * @param name
      */
     void getFile(HttpServletRequest request, HttpServletResponse response, String name) throws IOException;
+
+    /**
+     * 上传静态资源
+     *
+     * @param files
+     * @param fileMd5
+     * @param chunk
+     * @return
+     */
+    String uploadStaticFile(MultipartFile files, String fileMd5, Integer chunk);
+
+    /**
+     * 获取静态资源
+     *
+     * @param request
+     * @param response
+     * @param name
+     */
+    void getStaticFile(HttpServletRequest request, HttpServletResponse response, String name);
 }
