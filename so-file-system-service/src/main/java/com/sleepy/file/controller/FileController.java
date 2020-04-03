@@ -47,8 +47,17 @@ public class FileController {
     }
 
     @GetMapping(value = "/{fileName}")
-    public void getDir(HttpServletRequest request, HttpServletResponse response, @PathVariable("fileName") String name) throws IOException {
-        getDir(request, response, name);
+    public void getFile(HttpServletRequest request, HttpServletResponse response, @PathVariable("fileName") String name) throws IOException {
+        fileService.getFile(request, response, name);
     }
 
+    @PostMapping("/static/upload")
+    public String uploadStatic(@RequestParam("file") MultipartFile files, @RequestParam(value = "fileMd5", required = false) String fileMd5, @RequestParam(name = "chunk", defaultValue = "-1") Integer chunk) throws IOException {
+        return fileService.uploadStaticFile(files, fileMd5, chunk);
+    }
+
+    @GetMapping(value = "/static/{fileName}")
+    public void getStaticFile(HttpServletRequest request, HttpServletResponse response, @PathVariable("fileName") String name) throws IOException {
+        fileService.getFile(request, response, name);
+    }
 }

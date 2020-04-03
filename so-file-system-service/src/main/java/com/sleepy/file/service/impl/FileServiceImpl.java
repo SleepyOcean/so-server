@@ -149,6 +149,9 @@ public class FileServiceImpl implements FileService {
         if (CommonUtil.CATEGORY_AUDIO.equals(CommonUtil.getCategoryBySuffix(suffix))) {
             getAudioStream(request, response, file);
         }
+        if (CommonUtil.CATEGORY_HTML.equals(CommonUtil.getCategoryBySuffix(suffix))) {
+            getHTMLStream(request, response, file);
+        }
 
         // 设置response的Header
         response.addHeader("Content-Length", "" + file.length());
@@ -160,6 +163,16 @@ public class FileServiceImpl implements FileService {
         toClient.write(buffer);
         toClient.flush();
         toClient.close();
+    }
+
+    @Override
+    public String uploadStaticFile(MultipartFile files, String fileMd5, Integer chunk) {
+        return null;
+    }
+
+    @Override
+    public void getStaticFile(HttpServletRequest request, HttpServletResponse response, String name) {
+
     }
 
     private void getAudioStream(HttpServletRequest request, HttpServletResponse response, File file) throws IOException {
@@ -191,6 +204,17 @@ public class FileServiceImpl implements FileService {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("{} 获取图片失败！{} {}", "/compress请求", e.getMessage(), dir);
+        }
+    }
+
+    private void getHTMLStream(HttpServletRequest request, HttpServletResponse response, File file) {
+        try (OutputStream outputStream = response.getOutputStream();
+             FileInputStream fis = new FileInputStream(file);) {
+            response.setContentType("text/html;charset=utf-8");
+            FileCopyUtils.copy(fis, outputStream);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("获取文件失败！ {}", e.getMessage());
         }
     }
 
