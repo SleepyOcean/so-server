@@ -1,13 +1,18 @@
 package com.sleepy.security.handler;
 
+import com.sleepy.security.entity.SoUserEntity;
+import com.sleepy.security.repository.SecurityUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 用户登录处理
@@ -15,16 +20,24 @@ import org.springframework.stereotype.Component;
  * @author gehoubao
  * @create 2020-01-21 10:16
  **/
-@Component
+@Service
 public class UserDetailHandler implements UserDetailsService {
+
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    SecurityUserRepository securityUserRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return new User(username,
-                passwordEncoder.encode("123456"),
-                // 此处的角色需要`ROLE_`前缀。Spring Security配置中的角色不需要`ROLE_` 前缀
-                AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_ADMIN"));
+        SoUserEntity entity = securityUserRepository.findByName(username);
+        if (entity == null) {
+            throw new UsernameNotFoundException(username + "用户不存在!");
+        }
+
+        String[] roles = entity.getRoles().split(",");
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        for (int i = 0; i < roles.length; i++) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + roles[i]));
+        }
+        return new User(username, entity.getPassword(), authorities);
     }
 }

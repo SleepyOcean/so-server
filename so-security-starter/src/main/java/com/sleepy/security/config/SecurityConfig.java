@@ -1,17 +1,19 @@
 package com.sleepy.security.config;
 
-import com.sleepy.security.handler.JwtAccessDeniedHandler;
-import com.sleepy.security.handler.LoginFailureHandler;
-import com.sleepy.security.handler.LoginSuccessHandler;
-import com.sleepy.security.util.JwtAuthenticationTokenFilter;
+import com.sleepy.security.handler.UserDetailHandler;
+import com.sleepy.security.jwt.JWTAuthenticationFilter;
+import com.sleepy.security.jwt.JWTAuthorizationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * spring security 配置
@@ -19,42 +21,29 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * @author gehoubao
  * @create 2020-01-21 9:21
  **/
+@Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    @Autowired
-    private LoginSuccessHandler loginSuccessHandler;
-    @Autowired
-    private LoginFailureHandler loginFailureHandler;
 
     @Autowired
-    private JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private UserDetailHandler userDetailHandler;
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailHandler).passwordEncoder(passwordEncoder());
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        /** JWT拦截器*/
-        JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter = new JwtAuthenticationTokenFilter();
-        /** 将JWT拦截器添加到UsernamePasswordAuthenticationFilter之前*/
-        http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
-
-        http.formLogin()
-                .loginPage("/auth/loginInfo")
-                .loginProcessingUrl("/login")
-                .successHandler(loginSuccessHandler)
-                .failureHandler(loginFailureHandler);
-        http.authorizeRequests()
-                // 此处的角色不需要`ROLE_` 前缀,实现UserDetailsService设置角色时需要`ROLE_` 前缀
-                .antMatchers("/sys/**", "/resource/img/save", "/resource/img/delete").hasRole("ADMIN")
-                .antMatchers("/login", "/loginInfo", "/logoutSuccess", "/resource/img/**", "/**")
-                .permitAll()
-                .anyRequest()
-                .authenticated();
-        // 访问 /logout 表示用户注销，并清空session
-        http.logout().logoutSuccessUrl("/auth/logoutSuccess");
-        // 关闭csrf
-        http.csrf().disable();
-        http.cors();
-        // AccessDeniedHandler处理器 拒绝访问处理器
-        http.exceptionHandling().accessDeniedHandler(jwtAccessDeniedHandler);
+        http.authorizeRequests().anyRequest().permitAll().and().csrf().disable()
+                .formLogin().loginProcessingUrl("login").permitAll().and()
+                .logout().permitAll().and()
+                .addFilter(new JWTAuthenticationFilter(authenticationManager()))
+                .addFilter(new JWTAuthorizationFilter(authenticationManager()))
+                // 不需要session
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     /**
@@ -64,7 +53,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        //Spring自带的每次会随机生成盐值，即使密码相同，加密后也不同
         return new BCryptPasswordEncoder();
     }
 }
