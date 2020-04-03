@@ -9,7 +9,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 /**
  * @author KD8832
  */
-@SpringBootApplication(scanBasePackages = {"com.sleepy.blog", "com.sleepy.jpql", "com.sleepy.common"})
+@SpringBootApplication(scanBasePackages = {"com.sleepy.blog", "com.sleepy.jpql", "com.sleepy.common", "com.sleepy.security"})
 @EnableSwagger2
 public class SoBlogServiceApplication extends SpringBootServletInitializer {
 

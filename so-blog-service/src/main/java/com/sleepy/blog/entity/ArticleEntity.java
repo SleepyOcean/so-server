@@ -1,6 +1,5 @@
 package com.sleepy.blog.entity;
 
-import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -17,7 +16,6 @@ import java.util.Date;
 @Entity
 @Table(name = "so_article")
 @GenericGenerator(name = "jpa-uuid", strategy = "uuid")
-@ApiModel("博客文章表")
 public class ArticleEntity {
     @Id
     @GeneratedValue(generator = "jpa-uuid")
