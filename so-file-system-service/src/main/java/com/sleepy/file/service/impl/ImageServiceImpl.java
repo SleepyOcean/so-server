@@ -141,7 +141,7 @@ public class ImageServiceImpl implements ImageService {
             } catch (Exception e) {
                 File file = new File(imgPath);
                 file.delete();
-                result.put("status", HttpStatusCode.INTERNAL_SERVER_ERROR);
+                result.put("status", HttpStatusCode.INTERNAL_ERROR);
                 result.put("message", e.getMessage());
                 return new JSONObject(result).toJSONString();
             }
