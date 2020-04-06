@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.Collections;
 
 /**
- * JWT鉴权过滤器
+ * JWT授权过滤器
  *
  * @author gehoubao
  * @create 2020-04-03 14:53

@@ -3,6 +3,7 @@ package com.sleepy.security.controller;
 import com.sleepy.security.pojo.SecurityUserVO;
 import com.sleepy.security.service.SecurityUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -24,6 +25,7 @@ public class SecurityUserController {
     }
 
     @PostMapping("/add")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN')")
     public String newUser(@RequestBody SecurityUserVO vo) throws IOException {
         return securityUserService.newUser(vo);
     }

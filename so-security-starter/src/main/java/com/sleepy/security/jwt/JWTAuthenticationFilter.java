@@ -2,6 +2,7 @@ package com.sleepy.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sleepy.security.entity.SoUserEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,6 +24,7 @@ import java.util.Collection;
  * @author gehoubao
  * @create 2020-04-03 14:02
  **/
+@Slf4j
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private AuthenticationManager authenticationManager;
@@ -35,21 +37,29 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) throws AuthenticationException {
-
-        // 从输入流中获取到登录的信息
         try {
+            // 从输入流中获取到登录的信息
             SoUserEntity loginUser = new ObjectMapper().readValue(request.getInputStream(), SoUserEntity.class);
             return authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginUser.getName(), loginUser.getPassword())
             );
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("从输入流中获取到登录的信息失败 {}", e.getMessage());
             return null;
         }
     }
 
-    // 成功验证后调用的方法
-    // 如果验证成功，就生成token并返回
+    /**
+     * 成功验证后调用的方法
+     * 如果验证成功，就生成token并返回
+     *
+     * @param request
+     * @param response
+     * @param chain
+     * @param authResult
+     * @throws IOException
+     * @throws ServletException
+     */
     @Override
     protected void successfulAuthentication(HttpServletRequest request,
                                             HttpServletResponse response,
@@ -57,7 +67,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             Authentication authResult) throws IOException, ServletException {
         User user = (User) authResult.getPrincipal();
         JwtUser jwtUser = new JwtUser(user);
-        System.out.println("jwtUser:" + jwtUser.toString());
 
         String role = "";
         Collection<? extends GrantedAuthority> authorities = jwtUser.getAuthorities();
@@ -66,7 +75,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
 
         String token = JwtTokenUtils.createToken(jwtUser.getUsername(), role);
-        //String token = JwtTokenUtils.createToken(jwtUser.getUsername(), false);
         // 返回创建成功的token
         // 但是这里创建的token只是单纯的token
         // 按照jwt的规定，最后请求的时候应该是 `Bearer token`

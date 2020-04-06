@@ -22,7 +22,7 @@ public class JwtTokenUtils {
 
     public static final String SUBJECT = "congge";
 
-    public static final long EXPIRITION = 1000 * 24 * 60 * 60 * 7;
+    public static final long EXPIRITION = 7 * 24 * 60 * 60 * 1000;
 
     public static final String APPSECRET_KEY = "congge_secret";
 
