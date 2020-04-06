@@ -15,6 +15,14 @@ import java.util.List;
 public interface TagRepository extends JpaRepository<TagEntity, String> {
 
     /**
+     * 模糊搜索tag
+     *
+     * @return
+     */
+    @Query(value = "select distinct tag_name from so_tag where tag_name like :tag", nativeQuery = true)
+    List<String> findAllByTagLike(@Param("tag") String tag);
+
+    /**
      * 获取所有tag名称
      *
      * @return

@@ -59,11 +59,15 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public CommonDTO<ArticleEntity> getRelatedArticle(PostVO vo) throws IOException {
-        List<String> articleIds = tagRepository.findArticleIdsByTags(vo.getTags().split(","));
-        CommonDTO<ArticleEntity> result = new CommonDTO<>();
-        List<ArticleEntity> resultList = articleRepository.findAllByIds(articleIds);
-        result.setResultList(resultList);
-        return result;
+        if (StringTools.isNotNullOrEmpty(vo.getTags())) {
+            List<String> articleIds = tagRepository.findArticleIdsByTags(vo.getTags().split(","));
+            CommonDTO<ArticleEntity> result = new CommonDTO<>();
+            List<ArticleEntity> resultList = articleRepository.findAllByIds(articleIds);
+            result.setResultList(resultList);
+            return result;
+        } else {
+            return new CommonDTO<>();
+        }
     }
 
     @Override
@@ -82,8 +86,10 @@ public class PostServiceImpl implements PostService {
         if (!StringTools.isNullOrEmpty(vo.getCoverImg())) {
             entity.setCoverImg(vo.getCoverImg());
         }
-
-        articleRepository.saveAndFlush(entity);
+        if (StringTools.isNotNullOrEmpty(vo.getTags())) {
+            entity.setTags(vo.getTags());
+        }
+        String id = articleRepository.saveAndFlush(entity).getId();
         // 存储文章标签
         String[] tags = vo.getTags().split(",");
         for (int i = 0; i < tags.length; i++) {
@@ -92,7 +98,7 @@ public class PostServiceImpl implements PostService {
             tag.setArticleId(entity.getId());
             tagRepository.save(tag);
         }
-        result.setResult("success");
+        result.setResult(id);
 
         return result;
     }
@@ -103,13 +109,6 @@ public class PostServiceImpl implements PostService {
         List<ArticleEntity> resultList = articleRepository
                 .findAllByTitleLike("%" + vo.getKeyword() + "%",
                         PageRequest.of(vo.getStart(), vo.getSize(), Sort.by(Sort.Direction.DESC, "createTime"))).getContent();
-
-        if (StringTools.isNotNullOrEmpty(vo.getKeyword())) {
-            resultList.forEach(article -> {
-                article.setTitle(StringTools.replaceIgnoreCase(article.getTitle(), vo.getKeyword(), "<span style='color: #5D82ED'>" + vo.getKeyword() + "</span>"));
-            });
-        }
-
         result.setResultList(new ArrayList<>(resultList));
         return result;
     }
@@ -148,7 +147,11 @@ public class PostServiceImpl implements PostService {
     @Override
     public CommonDTO<String> getTags(PostVO vo) {
         CommonDTO<String> result = new CommonDTO<>();
-        result.setResultList(tagRepository.findAllTag());
+        if (StringTools.isNotNullOrEmpty(vo.getKeyword())) {
+            result.setResultList(tagRepository.findAllByTagLike(StringTools.getLikeSqlParams(vo.getKeyword())));
+        } else {
+            result.setResultList(tagRepository.findAllTag());
+        }
         return result;
     }
 
