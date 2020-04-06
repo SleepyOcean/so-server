@@ -50,7 +50,7 @@ public class RequestWrapper extends HttpServletRequestWrapper {
                 }
             }
         }
-        body = stringBuilder.toString().replaceAll("\\s*", "");
+        body = stringBuilder.toString();
     }
 
     @Override

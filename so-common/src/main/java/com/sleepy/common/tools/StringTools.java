@@ -183,4 +183,8 @@ public class StringTools {
         String r = m.replaceAll(replacement);
         return r;
     }
+
+    public static String getLikeSqlParams(String keyword) {
+        return "%" + keyword + "%";
+    }
 }
