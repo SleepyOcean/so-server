@@ -22,7 +22,7 @@
         <module>so-common</module>
         <module>so-blog-service</module>
         <module>so-file-system-service</module>
-        <module>so-security-starter</module>
+        <!--        <module>so-security-starter</module>-->
         <!--        <module>so-jpql-template-engine</module>-->
         <module>so-crawler-service</module>
     </modules>
