@@ -68,8 +68,8 @@ public class CustomController {
         request.sort(new Comparator<String>() {
             @Override
             public int compare(String o1, String o2) {
-                String s1 = o1.substring(0, 10);
-                String s2 = o2.substring(0, 10);
+                String s1 = o1.substring(0, 5);
+                String s2 = o2.substring(0, 5);
                 if (s1.compareTo(s2) > 0) {
                     return 1;
                 } else if (s1.compareTo(s2) < 0) {
