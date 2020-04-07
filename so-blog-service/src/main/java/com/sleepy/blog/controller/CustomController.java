@@ -46,6 +46,10 @@ public class CustomController {
         };
 
         synchronized (timeTaskList) {
+            Timer tmp = (Timer) timeTaskList.get(vo.get("name"));
+            if (tmp != null) {
+                tmp.cancel();
+            }
             t.scheduleAtFixedRate(task, startTime, dayS);
             timeTaskList.put(vo.get("name").toString(), t);
         }
