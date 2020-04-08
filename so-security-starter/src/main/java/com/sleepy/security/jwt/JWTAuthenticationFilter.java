@@ -1,5 +1,6 @@
 package com.sleepy.security.jwt;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sleepy.security.entity.SoUserEntity;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * JWT鉴权过滤器
@@ -82,6 +85,11 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.setContentType("application/json; charset=utf-8");
         String tokenStr = JwtTokenUtils.TOKEN_PREFIX + token;
         response.setHeader("token", tokenStr);
+
+        Map<String, Object> tokenInfo = new HashMap<String, Object>();
+        tokenInfo.put("Authorization", tokenStr);
+        //将token信息写入
+        response.getWriter().write(JSON.toJSONString(tokenInfo));
     }
 
     @Override
