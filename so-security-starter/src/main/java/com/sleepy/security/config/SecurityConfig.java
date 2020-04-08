@@ -3,6 +3,7 @@ package com.sleepy.security.config;
 import com.sleepy.security.handler.UserDetailHandler;
 import com.sleepy.security.jwt.JWTAuthenticationFilter;
 import com.sleepy.security.jwt.JWTAuthorizationFilter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * @author gehoubao
  * @create 2020-01-21 9:21
  **/
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -44,6 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // 不需要session
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        log.info("自定义security配置完成");
     }
 
     /**

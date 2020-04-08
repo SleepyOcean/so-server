@@ -9,7 +9,10 @@
     </parent>
     <artifactId>so-security-starter</artifactId>
     <packaging>jar</packaging>
-
+    <!--    <version>1.0.0.RELEASE</version>-->
+    <properties>
+        <!--        <maven.deploy.skip>false</maven.deploy.skip>-->
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -34,14 +37,5 @@
             <version>1.2.58</version>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

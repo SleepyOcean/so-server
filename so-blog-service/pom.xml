@@ -18,11 +18,11 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>com.sleepy</groupId>-->
-        <!--            <artifactId>so-security-starter</artifactId>-->
-        <!--            <version>${project.version}</version>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>com.sleepy</groupId>
+            <artifactId>so-security-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>com.sleepy</groupId>
