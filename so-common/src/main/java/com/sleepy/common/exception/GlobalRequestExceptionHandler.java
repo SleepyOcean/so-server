@@ -20,6 +20,7 @@ public class GlobalRequestExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public String handleServiceException(Exception e) {
+        e.printStackTrace();
         log.error("【全局异常提示】请求出错 {}", e.getMessage());
         return JSON.toJSON(GlobalExceptionMessage.getExceptionMessage(HttpStatusCode.INTERNAL_ERROR, e.getMessage())).toString();
     }
@@ -27,6 +28,7 @@ public class GlobalRequestExceptionHandler {
     @ExceptionHandler(Throwable.class)
     @ResponseBody
     public String handleIllegalParamException(Throwable throwable) {
+        throwable.printStackTrace();
         log.error("【全局异常提示】请求出错 {}", throwable.getMessage());
         return JSON.toJSON(GlobalExceptionMessage.getExceptionMessage(HttpStatusCode.INTERNAL_ERROR, throwable.getMessage())).toString();
     }

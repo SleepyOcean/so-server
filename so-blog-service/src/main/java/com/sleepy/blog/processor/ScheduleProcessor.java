@@ -1,15 +1,9 @@
 package com.sleepy.blog.processor;
 
-import com.sleepy.common.tools.CommandTools;
-import com.sleepy.common.tools.DateTools;
-import com.sleepy.common.tools.FileTools;
-import com.sleepy.common.tools.StringTools;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.quartz.*;
+import org.quartz.impl.DirectSchedulerFactory;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.util.Date;
 
 /**
  * 定时任务处理器
@@ -17,75 +11,142 @@ import java.util.Date;
  * @author gehoubao
  * @create 2019-09-30 14:11
  **/
-@Component
 @Slf4j
+@Component
 public class ScheduleProcessor {
 
-    @Value("${spring.datasource.username}")
-    private String username;
-    @Value("${spring.datasource.password}")
-    private String password;
+    private Scheduler scheduler;
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        ScheduleProcessor pass = new ScheduleProcessor();
-        System.out.println(pass.username + " , " + pass.password);
-//        new ScheduleProcessor().backupData("test", "so_project", "SoProject");
-    }
-
-    public void backupSoProject() {
+    public ScheduleProcessor() {
         try {
-            backupData("test", "so_project", "SoProject");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void backupSoSetting() {
-        try {
-            backupData("test", "so_setting", "SoSetting");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void backupSoImg() {
-        try {
-            backupData("test", "so_img", "SoImg");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+            DirectSchedulerFactory schedulerFactory = DirectSchedulerFactory.getInstance();
+            // 表示以3个工作线程初始化工厂
+            schedulerFactory.createVolatileScheduler(3);
+            scheduler = schedulerFactory.getScheduler();
+        } catch (SchedulerException e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * 备份数据
-     *
-     * @param dbName         需要备份的数据库名称
-     * @param tableName      需要备份的表名称
-     * @param tableClassName 定义备份表对应的类名称
-     * @throws IOException
-     * @throws InterruptedException
+     * @param jobName          任务名
+     * @param jobGroupName     任务组名
+     * @param triggerName      触发器名
+     * @param triggerGroupName 触发器组名
+     * @param jobClass         任务
+     * @param cron             时间设置，参考quartz说明文档
+     * @Description: 添加一个定时任务
      */
-    private void backupData(String dbName, String tableName, String tableClassName) throws IOException, InterruptedException {
-        String now = DateTools.dateFormat(new Date(), DateTools.FLYWAY_SQL_FILE_NAME_PATTERN);
-        String path = getStoreSqlPath() + "V" + now + StringTools.getRandomNumString(2) + "__" + tableClassName;
-        String command = "mysqldump -h localhost -u" + username + " -p" + password + " --databases " + dbName + " --tables " + tableName + " -r " + path + ".sql";
-        String result = CommandTools.execute(command);
-        System.out.println(result);
+    public void addJob(String jobName, String jobGroupName,
+                       String triggerName, String triggerGroupName, Class jobClass, String cron, Object data) {
+        try {
+            // 任务名，任务组，任务执行类
+            JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(jobName, jobGroupName).build();
+            jobDetail.getJobDataMap().put("params", data);
+
+            // 触发器
+            TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger();
+            // 触发器名,触发器组
+            triggerBuilder.withIdentity(triggerName, triggerGroupName);
+            triggerBuilder.startNow();
+            // 触发器时间设定
+            triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(cron));
+            // 创建Trigger对象
+            CronTrigger trigger = (CronTrigger) triggerBuilder.build();
+
+            // 调度容器设置JobDetail和Trigger
+            scheduler.scheduleJob(jobDetail, trigger);
+
+            // 启动
+            if (!scheduler.isShutdown()) {
+                scheduler.start();
+            }
+        } catch (Exception e) {
+            log.error("【定时任务处理器】创建定时任务失败！{}", e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
     /**
-     * 获取flyway的路径
-     *
-     * @return
-     * @throws IOException
+     * @param triggerName      触发器名
+     * @param triggerGroupName 触发器组名
+     * @param cron             时间设置，参考quartz说明文档
+     * @Description: 修改一个任务的触发时间
      */
-    private String getStoreSqlPath() throws IOException {
-        return FileTools.getProjectPath() + "\\src\\main\\resources\\db\\migration\\";
+    public void modifyJobTime(String triggerName, String triggerGroupName, String cron) {
+        try {
+            TriggerKey triggerKey = TriggerKey.triggerKey(triggerName, triggerGroupName);
+            CronTrigger trigger = (CronTrigger) scheduler.getTrigger(triggerKey);
+            if (trigger == null) {
+                return;
+            }
+
+            String oldTime = trigger.getCronExpression();
+            if (!oldTime.equalsIgnoreCase(cron)) {
+                // 触发器
+                TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger();
+                // 触发器名,触发器组
+                triggerBuilder.withIdentity(triggerName, triggerGroupName);
+                triggerBuilder.startNow();
+                // 触发器时间设定
+                triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(cron));
+                // 创建Trigger对象
+                trigger = (CronTrigger) triggerBuilder.build();
+                // 方式一 ：修改一个任务的触发时间
+                scheduler.rescheduleJob(triggerKey, trigger);
+            }
+        } catch (Exception e) {
+            log.error("【定时任务处理器】修改定时任务失败！{}", e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * @param jobName
+     * @param jobGroupName
+     * @param triggerName
+     * @param triggerGroupName
+     * @Description: 移除一个任务
+     */
+    public void removeJob(String jobName, String jobGroupName,
+                          String triggerName, String triggerGroupName) {
+        try {
+            TriggerKey triggerKey = TriggerKey.triggerKey(triggerName, triggerGroupName);
+            // 停止触发器
+            scheduler.pauseTrigger(triggerKey);
+            // 移除触发器
+            scheduler.unscheduleJob(triggerKey);
+            // 删除任务
+            scheduler.deleteJob(JobKey.jobKey(jobName, jobGroupName));
+        } catch (Exception e) {
+            log.error("【定时任务处理器】移除定时任务失败！{}", e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 启动所有定时任务
+     */
+    public void startJobs() {
+        try {
+            scheduler.start();
+        } catch (Exception e) {
+            log.error("【定时任务处理器】启动所有定时任务失败！{}", e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 关闭所有定时任务
+     */
+    public void shutdownJobs() {
+        try {
+            if (!scheduler.isShutdown()) {
+                scheduler.shutdown();
+            }
+        } catch (Exception e) {
+            log.error("【定时任务处理器】关闭所有定时任务失败！{}", e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 }

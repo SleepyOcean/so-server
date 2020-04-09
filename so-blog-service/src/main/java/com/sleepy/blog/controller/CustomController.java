@@ -1,10 +1,17 @@
 package com.sleepy.blog.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.sleepy.blog.processor.ScheduleProcessor;
+import com.sleepy.blog.task.RequestTask;
+import com.sleepy.blog.vo.custom.RequestVO;
 import com.sleepy.common.tools.HttpTools;
+import com.sleepy.common.tools.StringTools;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.Map;
 
 /**
@@ -19,6 +26,12 @@ import java.util.Map;
 @RequestMapping("/custom")
 public class CustomController {
 
+    @Autowired
+    ScheduleProcessor scheduleProcessor;
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
+    private String key = "key";
+
     @PostMapping("/request/post")
     public String requestPost(@RequestBody Map vo) {
         return HttpTools.doPost(vo.get("url").toString(), JSON.toJSONString(vo.get("params")));
@@ -27,5 +40,48 @@ public class CustomController {
     @PostMapping("/request/get")
     public String requestGet(@RequestBody Map vo) {
         return HttpTools.doGet(vo.get("url").toString());
+    }
+
+    @PostMapping("/task/request")
+    public String requestTask(@RequestBody RequestVO vo) {
+        String user = vo.getUser();
+        String time = vo.getTime();
+        String registerUser = stringRedisTemplate.opsForValue().get("RegisterUser");
+        if (StringTools.isNotNullOrEmpty(user) && StringTools.isNotNullOrEmpty(registerUser) && registerUser.contains(user)) {
+            scheduleProcessor.addJob("requestJob-" + time.replaceAll(":", ""), "requestJobGroup", "requestTrigger-" + time.replaceAll(":", ""), "requestTriggerGroup", RequestTask.class, "0 " + time.substring(3, 5) + " " + time.substring(0, 2) + " * * ? *", vo);
+
+            synchronized (key) {
+                stringRedisTemplate.opsForHash().put("requestTask:" + user, time.replaceAll(":", ""), JSON.toJSONString(vo));
+            }
+
+            return "定时任务创建成功";
+        } else {
+            return "未授权";
+        }
+    }
+
+
+    @PostMapping("/task/request/cancel")
+    public String cancelRequestTask(@RequestBody Map vo) throws ParseException {
+        String user = vo.get("user").toString();
+        String id = vo.get("id").toString();
+        String registerUser = stringRedisTemplate.opsForValue().get("RegisterUser");
+        if (StringTools.isNotNullOrEmpty(registerUser) && registerUser.contains(user)) {
+            scheduleProcessor.removeJob("requestJob-" + id, "requestJobGroup",
+                    "requestTrigger-" + id, "requestTriggerGroup");
+
+            synchronized (key) {
+                stringRedisTemplate.opsForHash().delete("requestTask:" + user, id);
+            }
+
+            return "定时任务取消成功";
+        } else {
+            return "未授权";
+        }
+    }
+
+    @GetMapping("/task/request/get")
+    public Object getRequestTask(@RequestParam(value = "user", required = true) String user) {
+        return stringRedisTemplate.opsForHash().entries("requestTask:" + user);
     }
 }

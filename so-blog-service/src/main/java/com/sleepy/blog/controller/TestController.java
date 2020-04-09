@@ -34,9 +34,6 @@ public class TestController {
 
     @GetMapping("/backupSQL")
     public String backupSql() {
-        scheduleProcessor.backupSoImg();
-        scheduleProcessor.backupSoProject();
-        scheduleProcessor.backupSoSetting();
         return "success";
     }
 }
