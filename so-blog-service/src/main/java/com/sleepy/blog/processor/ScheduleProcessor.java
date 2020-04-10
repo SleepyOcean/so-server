@@ -1,5 +1,7 @@
 package com.sleepy.blog.processor;
 
+import com.sleepy.common.exception.UserOperationIllegalException;
+import com.sleepy.common.tools.CommonTools;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.quartz.impl.DirectSchedulerFactory;
@@ -38,7 +40,7 @@ public class ScheduleProcessor {
      * @Description: 添加一个定时任务
      */
     public void addJob(String jobName, String jobGroupName,
-                       String triggerName, String triggerGroupName, Class jobClass, String cron, Object data) {
+                       String triggerName, String triggerGroupName, Class jobClass, String cron, Object data) throws UserOperationIllegalException {
         try {
             // 任务名，任务组，任务执行类
             JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(jobName, jobGroupName).build();
@@ -63,7 +65,7 @@ public class ScheduleProcessor {
             }
         } catch (Exception e) {
             log.error("【定时任务处理器】创建定时任务失败！{}", e.getMessage());
-            throw new RuntimeException(e);
+            CommonTools.throwUserExceptionInfo("创建定时任务失败！" + e.getMessage());
         }
     }
 
@@ -73,7 +75,7 @@ public class ScheduleProcessor {
      * @param cron             时间设置，参考quartz说明文档
      * @Description: 修改一个任务的触发时间
      */
-    public void modifyJobTime(String triggerName, String triggerGroupName, String cron) {
+    public void modifyJobTime(String triggerName, String triggerGroupName, String cron) throws UserOperationIllegalException {
         try {
             TriggerKey triggerKey = TriggerKey.triggerKey(triggerName, triggerGroupName);
             CronTrigger trigger = (CronTrigger) scheduler.getTrigger(triggerKey);
@@ -97,7 +99,7 @@ public class ScheduleProcessor {
             }
         } catch (Exception e) {
             log.error("【定时任务处理器】修改定时任务失败！{}", e.getMessage());
-            throw new RuntimeException(e);
+            CommonTools.throwUserExceptionInfo("修改定时任务失败！" + e.getMessage());
         }
     }
 
@@ -109,7 +111,7 @@ public class ScheduleProcessor {
      * @Description: 移除一个任务
      */
     public void removeJob(String jobName, String jobGroupName,
-                          String triggerName, String triggerGroupName) {
+                          String triggerName, String triggerGroupName) throws UserOperationIllegalException {
         try {
             TriggerKey triggerKey = TriggerKey.triggerKey(triggerName, triggerGroupName);
             // 停止触发器
@@ -120,33 +122,33 @@ public class ScheduleProcessor {
             scheduler.deleteJob(JobKey.jobKey(jobName, jobGroupName));
         } catch (Exception e) {
             log.error("【定时任务处理器】移除定时任务失败！{}", e.getMessage());
-            throw new RuntimeException(e);
+            CommonTools.throwUserExceptionInfo("移除定时任务失败！" + e.getMessage());
         }
     }
 
     /**
      * 启动所有定时任务
      */
-    public void startJobs() {
+    public void startJobs() throws UserOperationIllegalException {
         try {
             scheduler.start();
         } catch (Exception e) {
             log.error("【定时任务处理器】启动所有定时任务失败！{}", e.getMessage());
-            throw new RuntimeException(e);
+            CommonTools.throwUserExceptionInfo("启动所有定时任务失败！" + e.getMessage());
         }
     }
 
     /**
      * 关闭所有定时任务
      */
-    public void shutdownJobs() {
+    public void shutdownJobs() throws UserOperationIllegalException {
         try {
             if (!scheduler.isShutdown()) {
                 scheduler.shutdown();
             }
         } catch (Exception e) {
             log.error("【定时任务处理器】关闭所有定时任务失败！{}", e.getMessage());
-            throw new RuntimeException(e);
+            CommonTools.throwUserExceptionInfo("关闭所有定时任务失败！" + e.getMessage());
         }
     }
 }
