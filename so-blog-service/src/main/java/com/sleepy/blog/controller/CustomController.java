@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -50,7 +51,7 @@ public class CustomController {
         String user = vo.getUser();
         String time = vo.getTime();
         String registerUser = stringRedisTemplate.opsForValue().get("RegisterUser");
-        if (StringTools.isNotNullOrEmpty(user) && StringTools.isNotNullOrEmpty(registerUser) && registerUser.contains(user)) {
+        if (StringTools.isNotNullOrEmpty(user) && StringTools.isNotNullOrEmpty(registerUser) && Arrays.asList(registerUser.split(",")).contains(user)) {
             scheduleProcessor.addJob("requestJob-" + time.replaceAll(":", ""), "requestJobGroup", "requestTrigger-" + time.replaceAll(":", ""), "requestTriggerGroup", RequestTask.class, "0 " + time.substring(3, 5) + " " + time.substring(0, 2) + " * * ? *", vo);
 
             synchronized (key) {
@@ -60,7 +61,7 @@ public class CustomController {
 
             result.setResult("定时任务创建成功");
         } else {
-            CommonTools.throwExceptionInfo("未授权");
+            CommonTools.throwUserExceptionInfo("未授权");
         }
         return result;
     }
@@ -72,7 +73,7 @@ public class CustomController {
         String user = vo.get("user").toString();
         String id = vo.get("id").toString();
         String registerUser = stringRedisTemplate.opsForValue().get("RegisterUser");
-        if (StringTools.isNotNullOrEmpty(registerUser) && registerUser.contains(user)) {
+        if (StringTools.isNotNullOrEmpty(registerUser) && Arrays.asList(registerUser.split(",")).contains(user)) {
             scheduleProcessor.removeJob("requestJob-" + id, "requestJobGroup",
                     "requestTrigger-" + id, "requestTriggerGroup");
 
@@ -81,7 +82,7 @@ public class CustomController {
             }
             result.setResult("定时任务取消成功");
         } else {
-            CommonTools.throwExceptionInfo("未授权");
+            CommonTools.throwUserExceptionInfo("未授权");
         }
         return result;
     }
