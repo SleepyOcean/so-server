@@ -1,9 +1,12 @@
 package com.sleepy.blog.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.blog.processor.ScheduleProcessor;
 import com.sleepy.blog.task.RequestTask;
 import com.sleepy.blog.vo.custom.RequestVO;
+import com.sleepy.common.model.MapModel;
+import com.sleepy.common.tools.CommonTools;
 import com.sleepy.common.tools.HttpTools;
 import com.sleepy.common.tools.StringTools;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
 import java.util.Map;
 
 /**
@@ -43,7 +45,8 @@ public class CustomController {
     }
 
     @PostMapping("/task/request")
-    public String requestTask(@RequestBody RequestVO vo) {
+    public CommonDTO<String> requestTask(@RequestBody RequestVO vo) throws Exception {
+        CommonDTO<String> result = new CommonDTO<>();
         String user = vo.getUser();
         String time = vo.getTime();
         String registerUser = stringRedisTemplate.opsForValue().get("RegisterUser");
@@ -51,18 +54,21 @@ public class CustomController {
             scheduleProcessor.addJob("requestJob-" + time.replaceAll(":", ""), "requestJobGroup", "requestTrigger-" + time.replaceAll(":", ""), "requestTriggerGroup", RequestTask.class, "0 " + time.substring(3, 5) + " " + time.substring(0, 2) + " * * ? *", vo);
 
             synchronized (key) {
+                vo.setId(time.replaceAll(":", ""));
                 stringRedisTemplate.opsForHash().put("requestTask:" + user, time.replaceAll(":", ""), JSON.toJSONString(vo));
             }
 
-            return "定时任务创建成功";
+            result.setResult("定时任务创建成功");
         } else {
-            return "未授权";
+            CommonTools.throwExceptionInfo("未授权");
         }
+        return result;
     }
 
 
     @PostMapping("/task/request/cancel")
-    public String cancelRequestTask(@RequestBody Map vo) throws ParseException {
+    public CommonDTO<String> cancelRequestTask(@RequestBody Map vo) throws Exception {
+        CommonDTO<String> result = new CommonDTO<>();
         String user = vo.get("user").toString();
         String id = vo.get("id").toString();
         String registerUser = stringRedisTemplate.opsForValue().get("RegisterUser");
@@ -73,15 +79,17 @@ public class CustomController {
             synchronized (key) {
                 stringRedisTemplate.opsForHash().delete("requestTask:" + user, id);
             }
-
-            return "定时任务取消成功";
+            result.setResult("定时任务取消成功");
         } else {
-            return "未授权";
+            CommonTools.throwExceptionInfo("未授权");
         }
+        return result;
     }
 
     @GetMapping("/task/request/get")
-    public Object getRequestTask(@RequestParam(value = "user", required = true) String user) {
-        return stringRedisTemplate.opsForHash().entries("requestTask:" + user);
+    public CommonDTO<String> getRequestTask(@RequestParam(value = "user") String user) {
+        CommonDTO<String> result = new CommonDTO<>();
+        result.setExtra(CommonTools.getCustomMap(new MapModel("taskList", stringRedisTemplate.opsForHash().entries("requestTask:" + user).values())));
+        return result;
     }
 }

@@ -1,6 +1,7 @@
 package com.sleepy.blog.task;
 
 import com.alibaba.fastjson.JSON;
+import com.sleepy.blog.vo.custom.RequestVO;
 import com.sleepy.common.model.MapModel;
 import com.sleepy.common.tools.CommonTools;
 import com.sleepy.common.tools.HttpTools;
@@ -20,9 +21,10 @@ import java.util.Map;
 public class RequestTask implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) {
-        Map<String, Object> vo = (Map<String, Object>) jobExecutionContext.getJobDetail().getJobDataMap().get("params");
-        Map<String, Object> params = CommonTools.getCustomMap(new MapModel("msgtype", "text"), new MapModel("text", CommonTools.getCustomMap(new MapModel("content", vo.get("msg").toString()))));
-        HttpTools.doPost(vo.get("url").toString(), JSON.toJSONString(params));
-        log.info("【定时任务 - 请求】发送定时消息，[{}] 内容： {}", vo.get("url").toString(), vo.get("msg").toString());
+        RequestVO vo = (RequestVO) jobExecutionContext.getJobDetail().getJobDataMap().get("params");
+        Map<String, Object> params = CommonTools.getCustomMap(new MapModel("msgtype", "text"),
+                new MapModel("text", CommonTools.getCustomMap(new MapModel("content", vo.getMsg()), new MapModel("mentioned_mobile_list", vo.getMention()))));
+        HttpTools.doPost(vo.getUrl(), JSON.toJSONString(params));
+        log.info("【定时任务 - 请求】发送定时消息，[{}] 内容： {}", vo.getUrl(), vo.getMsg());
     }
 }

@@ -2,6 +2,8 @@ package com.sleepy.blog.vo.custom;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * 请求转发VO
  *
@@ -13,6 +15,7 @@ public class RequestVO {
     private String user;
     private String name;
     private String url;
+    private List<String> mention;
     private String msg;
     private String time;
     private String id;
