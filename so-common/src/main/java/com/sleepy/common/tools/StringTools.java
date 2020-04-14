@@ -187,4 +187,25 @@ public class StringTools {
     public static String getLikeSqlParams(String keyword) {
         return "%" + keyword + "%";
     }
+
+    /**
+     * 获取保留小数点后指定位数的字符串
+     *
+     * @param val
+     * @param scale
+     * @return
+     */
+    public static String getValFormat(String val, int scale) {
+        if (scale < 0) {
+            throw new IllegalArgumentException("The precision must be a positive integer or zero");
+        }
+        BigDecimal b = new BigDecimal(val);
+        BigDecimal one = new BigDecimal("1");
+        if (Double.parseDouble(val) > 0) {
+            //此处的scale表示的是，小数点之后的精度。
+            return b.divide(one, scale, BigDecimal.ROUND_DOWN).toString();
+        } else {
+            return b.divide(one, scale, BigDecimal.ROUND_UP).toString();
+        }
+    }
 }

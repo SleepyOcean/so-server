@@ -31,6 +31,8 @@ public class ScheduleProcessor {
     }
 
     /**
+     * 添加定时任务
+     *
      * @param jobName          任务名
      * @param jobGroupName     任务组名
      * @param triggerName      触发器名
@@ -70,6 +72,7 @@ public class ScheduleProcessor {
     }
 
     /**
+     * 修改定时任务
      * @param triggerName      触发器名
      * @param triggerGroupName 触发器组名
      * @param cron             时间设置，参考quartz说明文档
@@ -104,6 +107,7 @@ public class ScheduleProcessor {
     }
 
     /**
+     * 移除定时任务
      * @param jobName
      * @param jobGroupName
      * @param triggerName
@@ -128,6 +132,7 @@ public class ScheduleProcessor {
 
     /**
      * 启动所有定时任务
+     * @throws UserOperationIllegalException
      */
     public void startJobs() throws UserOperationIllegalException {
         try {
@@ -140,6 +145,7 @@ public class ScheduleProcessor {
 
     /**
      * 关闭所有定时任务
+     * @throws UserOperationIllegalException
      */
     public void shutdownJobs() throws UserOperationIllegalException {
         try {

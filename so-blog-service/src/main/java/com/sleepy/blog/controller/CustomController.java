@@ -39,7 +39,6 @@ public class CustomController {
         return customService.requestTask(vo);
     }
 
-
     @PostMapping("/task/request/cancel")
     public CommonDTO<String> cancelRequestTask(@RequestBody Map vo) throws Exception {
         return customService.cancelRequestTask(vo);

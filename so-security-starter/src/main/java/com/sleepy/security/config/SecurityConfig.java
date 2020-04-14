@@ -46,7 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // 不需要session
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        log.info("自定义security配置完成");
+        log.info("custom security configuration completed.");
     }
 
     /**

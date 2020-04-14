@@ -317,7 +317,7 @@ public class ExcelTools {
                 // 设置工作表信息
                 Sheet sheet1 = new Sheet(sheetNo++, 1, null, sheetName, null);
                 // 设置开始行为-1
-                sheet1.setStartRow(-1);
+                sheet1.setStartRow(0);
                 // 设置自适应宽度
                 sheet1.setAutoWidth(Boolean.TRUE);
                 // 开始写数据
