@@ -1,16 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <jpa module="testJpql">
     <jpql id="customSQL">
-        select * from so_tag where 1=1
-        #if($title)
-        and title like :title
-        #end
-        #if($readCount)
-        and read_count &gt; :readCount
+        select tag_name, article_ids from so_tag where 1=1
+        #if($name)
+        and tag_name like :name
         #end
         #if($tagNames)
         and tag_name in (:tagNames)
         #end
-        limit 10
+    </jpql>
+    <jpql id="customArticle">
+        select count(*) as articleAmount, sum(hot_rate) as hotRateSum from so_article where 1=1
+        #if($startTime)
+        and create_time &gt; :startTime
+        #end
+        #if($endTime)
+        and create_time &lt; :endTime
+        #end
+    </jpql>
+    <jpql id="customArticle2">
+        select create_time, title from so_article where 1=1
+        #if($startTime)
+        and create_time &gt; :startTime
+        #end
+        #if($endTime)
+        and create_time &lt; :endTime
+        #end
     </jpql>
 </jpa>

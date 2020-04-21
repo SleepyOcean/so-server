@@ -11,7 +11,6 @@ import com.sleepy.blog.service.ImgService;
 import com.sleepy.blog.service.PostService;
 import com.sleepy.blog.vo.PostVO;
 import com.sleepy.common.tools.StringTools;
-import com.sleepy.jpql.JpqlExecutor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -46,8 +45,6 @@ public class PostServiceImpl implements PostService {
     CacheService cacheService;
     @Autowired
     ImgService imgService;
-    @Autowired
-    JpqlExecutor jpqlExecutor;
 
     @Override
     public CommonDTO<ArticleEntity> getHotArticle(PostVO vo) throws IOException {

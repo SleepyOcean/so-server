@@ -6,7 +6,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.1.6.RELEASE</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
     <groupId>com.sleepy</groupId>
     <artifactId>so-blog-server</artifactId>
@@ -23,7 +23,6 @@
         <module>so-blog-service</module>
         <module>so-file-system-service</module>
         <module>so-security-starter</module>
-        <!--        <module>so-jpql-template-engine</module>-->
         <module>so-crawler-service</module>
     </modules>
 
