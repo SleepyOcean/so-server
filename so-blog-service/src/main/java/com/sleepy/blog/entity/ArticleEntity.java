@@ -34,6 +34,9 @@ public class ArticleEntity {
     @Column(name = "coverImg", columnDefinition = "VARCHAR(255) COMMENT '封面url'")
     private String coverImg;
 
+    @Column(name = "contentImg", columnDefinition = "VARCHAR(255) COMMENT '文章内图片url列表，多个以逗号分隔'")
+    private String contentImg;
+
     @Column(name = "updateTime", columnDefinition = "DATETIME COMMENT '最后一次更新时间'")
     private Date updateTime;
 

@@ -7,7 +7,6 @@ import com.sleepy.blog.entity.TagEntity;
 import com.sleepy.blog.repository.ArticleRepository;
 import com.sleepy.blog.repository.TagRepository;
 import com.sleepy.blog.service.CacheService;
-import com.sleepy.blog.service.ImgService;
 import com.sleepy.blog.service.PostService;
 import com.sleepy.blog.vo.PostVO;
 import com.sleepy.common.tools.StringTools;
@@ -43,8 +42,6 @@ public class PostServiceImpl implements PostService {
     TagRepository tagRepository;
     @Autowired
     CacheService cacheService;
-    @Autowired
-    ImgService imgService;
 
     @Override
     public CommonDTO<ArticleEntity> getHotArticle(PostVO vo) throws IOException {
@@ -80,6 +77,9 @@ public class PostServiceImpl implements PostService {
         entity.setTitle(vo.getTitle());
         entity.setContent(vo.getContent());
         entity.setSummary(vo.getSummary());
+        if (StringTools.isNotNullOrEmpty(vo.getContentImg())) {
+            entity.setContentImg(vo.getContentImg());
+        }
         if (!StringTools.isNullOrEmpty(vo.getCoverImg())) {
             entity.setCoverImg(vo.getCoverImg());
         }
