@@ -18,5 +18,6 @@ public class RequestVO {
     private List<String> mention;
     private String msg;
     private String time;
+    private String cron;
     private String id;
 }

@@ -48,13 +48,20 @@ public class CustomServiceImpl implements CustomService {
 
     @Override
     public CommonDTO<String> requestTask(RequestVO vo) throws UserOperationIllegalException {
-
         CommonDTO<String> result = new CommonDTO<>();
         String user = vo.getUser();
         String time = vo.getTime();
+        String cron = "0 " + time.substring(3, 5) + " " + time.substring(0, 2) + " * * ? *";
+        if (StringTools.isNotNullOrEmpty(vo.getCron())) {
+            cron = vo.getCron();
+        }
         String registerUser = stringRedisTemplate.opsForValue().get("RegisterUser");
         if (StringTools.isNotNullOrEmpty(user) && StringTools.isNotNullOrEmpty(registerUser) && Arrays.asList(registerUser.split(",")).contains(user)) {
-            scheduleProcessor.addJob("requestJob-" + time.replaceAll(":", ""), "requestJobGroup", "requestTrigger-" + time.replaceAll(":", ""), "requestTriggerGroup", RequestTask.class, "0 " + time.substring(3, 5) + " " + time.substring(0, 2) + " * * ? *", vo);
+            scheduleProcessor.addJob("requestJob-" + time.replaceAll(":", ""),
+                    "requestJobGroup",
+                    "requestTrigger-" + time.replaceAll(":", ""),
+                    "requestTriggerGroup", RequestTask.class,
+                    cron, vo);
 
             synchronized (key) {
                 vo.setId(time.replaceAll(":", ""));

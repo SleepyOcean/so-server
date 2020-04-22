@@ -22,6 +22,6 @@ public class InitComponent implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         cacheService.setSettingCache();
-//        customService.recoverScheduleTask();
+        customService.recoverScheduleTask();
     }
 }
