@@ -23,7 +23,7 @@ spring:
       max-request-size: 104857600
   redis:
     host: redis.sleepyocean.cn
-    port: 8015
+    port: 8011
     timeout: 3000
     jedis.pool:
       max-active: 8
