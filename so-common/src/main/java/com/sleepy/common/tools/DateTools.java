@@ -70,10 +70,6 @@ public class DateTools {
         return null;
     }
 
-    public static void main(String[] args) {
-        randomDate("1", "1");
-    }
-
     private static long random(long begin, long end) {
         long rtn = begin + (long) (Math.random() * (end - begin));
         if (rtn == begin || rtn == end) {
