@@ -39,7 +39,7 @@ public class FileTools {
             in.read(filecontent);
             return new String(filecontent, encoding);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.logExceptionInfo(e);
             return null;
         } finally {
             in.close();
@@ -233,7 +233,7 @@ public class FileTools {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                LogTools.logExceptionInfo(e);
             }
         }
 
@@ -274,7 +274,7 @@ public class FileTools {
                 }
                 fos = new FileOutputStream(file, true);
             } catch (IOException e) {
-                e.printStackTrace();
+                LogTools.logExceptionInfo(e);
             }
         }
 
@@ -283,7 +283,7 @@ public class FileTools {
                 fos.write(content.getBytes());
                 fos.write("\r\n".getBytes());
             } catch (IOException e) {
-                e.printStackTrace();
+                LogTools.logExceptionInfo(e);
             }
         }
 
@@ -298,9 +298,9 @@ public class FileTools {
                     System.out.println(line);
                 }
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                LogTools.logExceptionInfo(e);
             } catch (IOException e) {
-                e.printStackTrace();
+                LogTools.logExceptionInfo(e);
             }
         }
 
@@ -310,7 +310,7 @@ public class FileTools {
                     fos.flush();
                     fos.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LogTools.logExceptionInfo(e);
                 }
             }
         }

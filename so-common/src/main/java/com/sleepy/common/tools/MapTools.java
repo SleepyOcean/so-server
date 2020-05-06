@@ -28,8 +28,8 @@ public class MapTools {
         String address = "";
         try {
             address = java.net.URLEncoder.encode(addr, "UTF-8");
-        } catch (UnsupportedEncodingException e1) {
-            e1.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            LogTools.logExceptionInfo(e);
         }
         String url = String.format("http://api.map.baidu.com/place/v2/search?"
                 + "ak=yourkey&output=json&query=%s&region=全国", address);

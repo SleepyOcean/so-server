@@ -2,6 +2,7 @@ package com.sleepy.blog.processor;
 
 import com.sleepy.common.exception.UserOperationIllegalException;
 import com.sleepy.common.tools.CommonTools;
+import com.sleepy.common.tools.LogTools;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.quartz.impl.DirectSchedulerFactory;
@@ -26,7 +27,7 @@ public class ScheduleProcessor {
             schedulerFactory.createVolatileScheduler(3);
             scheduler = schedulerFactory.getScheduler();
         } catch (SchedulerException e) {
-            e.printStackTrace();
+            LogTools.logExceptionInfo(e);
         }
     }
 

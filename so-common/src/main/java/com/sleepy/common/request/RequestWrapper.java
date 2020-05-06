@@ -1,5 +1,7 @@
 package com.sleepy.common.request;
 
+import com.sleepy.common.tools.LogTools;
+
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -39,14 +41,14 @@ public class RequestWrapper extends HttpServletRequestWrapper {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LogTools.logExceptionInfo(e);
                 }
             }
             if (bufferedReader != null) {
                 try {
                     bufferedReader.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LogTools.logExceptionInfo(e);
                 }
             }
         }

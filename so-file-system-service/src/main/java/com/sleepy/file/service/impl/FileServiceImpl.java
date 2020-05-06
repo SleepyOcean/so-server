@@ -1,5 +1,6 @@
 package com.sleepy.file.service.impl;
 
+import com.sleepy.common.tools.LogTools;
 import com.sleepy.file.service.FileService;
 import com.sleepy.file.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -199,10 +200,10 @@ public class FileServiceImpl implements FileService {
             response.addHeader("Cache-Control", "max-age=604800");
             Thumbnails.of(dir).scale(Float.parseFloat(ratio)).outputFormat("jpeg").toOutputStream(outputStream);
         } catch (NumberFormatException e) {
-            e.printStackTrace();
+            LogTools.logExceptionInfo(e);
             log.error("图片压缩失败，ratio值应为float类型，如ratio=0.25f(缩小至0.25倍)，失败URL：{}", dir);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.logExceptionInfo(e);
             log.error("{} 获取图片失败！{} {}", "/compress请求", e.getMessage(), dir);
         }
     }
@@ -213,7 +214,7 @@ public class FileServiceImpl implements FileService {
             response.setContentType("text/html;charset=utf-8");
             FileCopyUtils.copy(fis, outputStream);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.logExceptionInfo(e);
             log.error("获取文件失败！ {}", e.getMessage());
         }
     }
@@ -251,7 +252,7 @@ public class FileServiceImpl implements FileService {
             return mergeFile;
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LogTools.logExceptionInfo(e);
             return null;
         }
     }

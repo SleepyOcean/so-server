@@ -1,5 +1,6 @@
 package com.sleepy.file.util;
 
+import com.sleepy.common.tools.LogTools;
 import org.apache.commons.codec.binary.Hex;
 
 import java.io.File;
@@ -99,7 +100,7 @@ public class CommonUtil {
             }
             return new String(Hex.encodeHex(MD5.digest()));
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.logExceptionInfo(e);
             return null;
         } finally {
             try {
@@ -107,7 +108,7 @@ public class CommonUtil {
                     fileInputStream.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                LogTools.logExceptionInfo(e);
             }
         }
     }

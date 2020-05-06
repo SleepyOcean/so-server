@@ -3,10 +3,7 @@ package com.sleepy.file.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.sleepy.common.constant.HttpStatusCode;
-import com.sleepy.common.tools.DateTools;
-import com.sleepy.common.tools.FileTools;
-import com.sleepy.common.tools.ImageTools;
-import com.sleepy.common.tools.StringTools;
+import com.sleepy.common.tools.*;
 import com.sleepy.file.common.Constant;
 import com.sleepy.file.dao.ImageDAO;
 import com.sleepy.file.dto.ImageDTO;
@@ -85,7 +82,7 @@ public class ImageServiceImpl implements ImageService {
         } catch (NumberFormatException e) {
             log.error("图片压缩失败，ratio值应为float类型，如ratio=0.25f(缩小至0.25倍)，失败URL：{}", url);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.logExceptionInfo(e);
             log.error("{} 获取图片失败！{} {}", "/compress请求", e.getMessage(), url);
         } finally {
             try {

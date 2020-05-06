@@ -4,7 +4,9 @@ import com.sleepy.security.entity.SoUserEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +17,7 @@ import java.util.Map;
  * @author gehoubao
  * @create 2020-04-03 14:55
  **/
+@Slf4j
 public class JwtTokenUtils {
 
     public static final String TOKEN_HEADER = "Authorization";
@@ -77,7 +80,7 @@ public class JwtTokenUtils {
             final Claims claims = Jwts.parser().setSigningKey(APPSECRET_KEY).parseClaimsJws(token).getBody();
             return claims;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("异常信息(message): {}, 异常类型(class): {}, 异常堆栈(stackTrack): {}", e.getMessage(), e.getClass().getName(), Arrays.asList(e.getStackTrace()).toString());
             return null;
         }
     }

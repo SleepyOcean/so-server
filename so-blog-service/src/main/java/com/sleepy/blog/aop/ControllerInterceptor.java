@@ -2,6 +2,7 @@ package com.sleepy.blog.aop;
 
 import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.common.exception.UserOperationIllegalException;
+import com.sleepy.common.tools.LogTools;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -47,12 +48,12 @@ public class ControllerInterceptor {
             result.setMessage(e.getMessage());
             log.error("用户操作异常：" + e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.logExceptionInfo(e);
             result.setStatus(503);
             result.setMessage(e.getMessage());
             log.error("serviceImpl异常：" + e.getMessage());
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
+            LogTools.logExceptionInfo(throwable);
             result.setStatus(503);
             result.setMessage(throwable.getMessage());
             log.error("Controller拦截器异常：" + throwable.getMessage());

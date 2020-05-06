@@ -64,7 +64,7 @@ public class CommandTools {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                LogTools.logExceptionInfo(e);
             }
         }
 

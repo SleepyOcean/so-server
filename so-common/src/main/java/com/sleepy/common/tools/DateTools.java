@@ -65,9 +65,13 @@ public class DateTools {
             long date = random(start.getTime(), end.getTime());
             return dateFormat(new Date(date));
         } catch (Exception e) {
-            e.printStackTrace();
+            LogTools.logExceptionInfo(e);
         }
         return null;
+    }
+
+    public static void main(String[] args) {
+        randomDate("1", "1");
     }
 
     private static long random(long begin, long end) {

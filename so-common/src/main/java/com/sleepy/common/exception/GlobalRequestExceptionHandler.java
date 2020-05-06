@@ -2,6 +2,7 @@ package com.sleepy.common.exception;
 
 import com.alibaba.fastjson.JSON;
 import com.sleepy.common.constant.HttpStatusCode;
+import com.sleepy.common.tools.LogTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,15 +21,14 @@ public class GlobalRequestExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public String handleServiceException(Exception e) {
-        e.printStackTrace();
-        log.error("【全局异常提示】请求出错 {}", e.getMessage());
+        LogTools.logExceptionInfo(e);
         return JSON.toJSON(GlobalExceptionMessage.getExceptionMessage(HttpStatusCode.INTERNAL_ERROR, e.getMessage())).toString();
     }
 
     @ExceptionHandler(Throwable.class)
     @ResponseBody
     public String handleIllegalParamException(Throwable throwable) {
-        throwable.printStackTrace();
+        LogTools.logExceptionInfo(throwable);
         log.error("【全局异常提示】请求出错 {}", throwable.getMessage());
         return JSON.toJSON(GlobalExceptionMessage.getExceptionMessage(HttpStatusCode.INTERNAL_ERROR, throwable.getMessage())).toString();
     }

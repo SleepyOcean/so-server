@@ -10,6 +10,7 @@ import com.sleepy.common.exception.UserOperationIllegalException;
 import com.sleepy.common.model.MapModel;
 import com.sleepy.common.tools.CommonTools;
 import com.sleepy.common.tools.HttpTools;
+import com.sleepy.common.tools.LogTools;
 import com.sleepy.common.tools.StringTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,7 +113,7 @@ public class CustomServiceImpl implements CustomService {
                     try {
                         requestTask(JSON.toJavaObject(JSON.parseObject(vo.toString()), RequestVO.class));
                     } catch (UserOperationIllegalException e) {
-                        e.printStackTrace();
+                        LogTools.logExceptionInfo(e);
                     }
                 });
             }

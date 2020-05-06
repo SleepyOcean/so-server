@@ -66,8 +66,7 @@ public class HttpTools {
             //把entity转换成字符串
             result = EntityUtils.toString(entity, "utf-8");
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LogTools.logExceptionInfo(e);
         }
         return result;
     }
@@ -100,8 +99,7 @@ public class HttpTools {
             //将httpEntity转换为string
             result = EntityUtils.toString(entity, "utf-8");
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LogTools.logExceptionInfo(e);
         }
         return result;
     }
