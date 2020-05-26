@@ -1,4 +1,4 @@
-package com.sleepy.blog.vo;
+package com.sleepy.blog.vo.article;
 
 import lombok.Data;
 
@@ -16,9 +16,12 @@ public class PostVO {
     private String summary;
     private String coverImg;
     private String contentImg;
+    private Integer collection;
     private String tags;
     private String date;
     private String keyword;
+
+    private String collectionKeyword;
 
     private Integer size;
     private Integer start;

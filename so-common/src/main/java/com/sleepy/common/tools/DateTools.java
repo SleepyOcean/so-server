@@ -83,4 +83,8 @@ public class DateTools {
         c.add(unit, amount);
         return c.getTime();
     }
+
+    public static String currentTimeStr() {
+        return dateFormat(new Date());
+    }
 }

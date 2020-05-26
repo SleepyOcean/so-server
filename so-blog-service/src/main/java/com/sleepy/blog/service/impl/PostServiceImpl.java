@@ -3,12 +3,17 @@ package com.sleepy.blog.service.impl;
 import com.google.common.collect.Lists;
 import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.blog.entity.ArticleEntity;
+import com.sleepy.blog.entity.CollectionEntity;
 import com.sleepy.blog.entity.TagEntity;
 import com.sleepy.blog.repository.ArticleRepository;
+import com.sleepy.blog.repository.CollectionRepository;
 import com.sleepy.blog.repository.TagRepository;
 import com.sleepy.blog.service.CacheService;
 import com.sleepy.blog.service.PostService;
-import com.sleepy.blog.vo.PostVO;
+import com.sleepy.blog.vo.article.CollectionVO;
+import com.sleepy.blog.vo.article.PostVO;
+import com.sleepy.common.tools.ClassTools;
+import com.sleepy.common.tools.DateTools;
 import com.sleepy.common.tools.StringTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +41,8 @@ public class PostServiceImpl implements PostService {
     public static final String INDEX_NAME = "so_blog";
     public static final String TYPE_NAME = "so_article";
 
+    @Autowired
+    CollectionRepository collectionRepository;
     @Autowired
     ArticleRepository articleRepository;
     @Autowired
@@ -77,6 +84,7 @@ public class PostServiceImpl implements PostService {
         entity.setTitle(vo.getTitle());
         entity.setContent(vo.getContent());
         entity.setSummary(vo.getSummary());
+        entity.setCollection(vo.getCollection());
         if (StringTools.isNotNullOrEmpty(vo.getContentImg())) {
             entity.setContentImg(vo.getContentImg());
         }
@@ -150,6 +158,26 @@ public class PostServiceImpl implements PostService {
             result.setResultList(tagRepository.findAllTag());
         }
         return result;
+    }
+
+    @Override
+    public CommonDTO<CollectionEntity> getCollections(PostVO vo) {
+        CommonDTO<CollectionEntity> result = new CommonDTO<>();
+        if (StringTools.isNotNullOrEmpty(vo.getCollectionKeyword())) {
+            List<CollectionEntity> resultList = collectionRepository.findAllByNameLike("%" + vo.getCollectionKeyword() + "%");
+            result.setResultList(resultList);
+        }
+        return result;
+    }
+
+    @Override
+    public CommonDTO<CollectionEntity> saveCollections(CollectionVO vo) {
+        CollectionEntity entity = new CollectionEntity();
+        ClassTools.copyValue(vo, entity);
+        entity.setCreateTime(DateTools.currentTimeStr());
+        entity.setUpdateTime(DateTools.currentTimeStr());
+        collectionRepository.saveAndFlush(entity);
+        return new CommonDTO<>(entity);
     }
 
 }

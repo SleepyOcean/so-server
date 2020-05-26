@@ -6,6 +6,9 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.sleepy.common.model.MapModel;
+import lombok.SneakyThrows;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -23,6 +26,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -226,7 +230,69 @@ public class HttpTools {
         return respContent;
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException {
+        System.setProperty("org.apache.commons.logging.LogFactory", "org.apache.commons.logging.impl.LogFactoryImpl");
+        LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");
+        LogFactory.getFactory().setAttribute("org.apache.commons.logging.simplelog.defaultlog", "error");
+//        webAutoTest();
+//        requestTest();
+        offsetTest();
+    }
+
+    private static void requestTest() throws IOException {
+        String devices = FileTools.readToString("E:\\Haiyan\\相关文档及资源\\海燕\\视图库\\deivceList.txt");
+        String[] deviceArray = devices.split(",");
+
+        Random random = new Random();
+
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @SneakyThrows
+            public void run() {
+                String parmas = FileTools.readToString("E:\\Haiyan\\相关文档及资源\\海燕\\视图库\\过车数据-苏B9ZW50.json");
+                String passTime = DateTools.dateFormat(new Date(), DateTools.CUSTOM_DATETIME_PATTERN);
+                String deviceId = deviceArray[random.nextInt(deviceArray.length)];
+                parmas = parmas.replaceAll("\"PassTime\":\"20200514131648\",", "\"PassTime\":\"" + passTime + "\",");
+                parmas = parmas.replaceAll("\"AppearTime\":\"20200514131648\",", "\"AppearTime\":\"" + passTime + "\",");
+                parmas = parmas.replaceAll("\"DisAppearTime\":\"20200514131648\",", "\"DisAppearTime\":\"" + passTime + "\",");
+                parmas = parmas.replaceAll("\"MarkTime\":\"20200514131648\",", "\"MarkTime\":\"" + passTime + "\",");
+                parmas = parmas.replaceAll("\"DeviceID\":\"32050500011120000858\",", "\"DeviceID\":\"" + deviceId + "\",");
+                parmas = parmas.replaceAll("\"MotorVehicleID\":\"ed2e7f65c982481b947eebbbacf93d0c\",", "\"MotorVehicleID\":\"" + StringTools.getRandomUuid("").substring(0, 18) + passTime + "\",");
+                String result = doPost("http://10.65.5.70:8000/VIID/Images", parmas);
+                System.out.println(result);
+            }
+        }, 1000, 60000);
+    }
+
+    private static void offsetTest() {
+        String sql = "SELECT A.PlateNo AS plateNo, A.PlateColor AS plateColor, A.FirstEnter AS passTime FROM (SELECT PlateID, PlateNo, PlateColor, MIN(PassTime) AS FirstEnter, COUNT(*) AS CNT FROM kdmotovehicle WHERE 1=1  AND PassTime >= '2020-04-15 16:32:58'   AND PassTime <= '2020-05-15 16:32:59'   and PassTimeHour >= 1586937600   and PassTimeHour <= 1589529600     AND PlateNo != '********' AND PlateNo != '00000000' GROUP BY PlateID HAVING CNT >= 1) A LEFT JOIN (SELECT DISTINCT PlateID FROM kdmotovehicle WHERE 1=1  AND PassTime >= '2020-01-16 16:32:58'   AND PassTimeHour >= 1579161600   AND PassTime <= '2020-04-15 16:32:58'   and PassTimeHour <= 1586937600    ) B ON A.PlateID = B.PlateID WHERE B.PlateID IS NULL";
+        List<MapModel> offsetLimitList = new ArrayList<>();
+        offsetLimitList.add(new MapModel("1000", 1000));
+        offsetLimitList.add(new MapModel("1000", 2000));
+        offsetLimitList.add(new MapModel("1000", 3000));
+        offsetLimitList.add(new MapModel("2000", 1000));
+        offsetLimitList.add(new MapModel("2000", 2000));
+        offsetLimitList.add(new MapModel("2000", 3000));
+        offsetLimitList.add(new MapModel("5000", 1000));
+        offsetLimitList.add(new MapModel("5000", 2000));
+        offsetLimitList.add(new MapModel("5000", 3000));
+
+        offsetLimitList.forEach(p -> {
+            String offsetLimit = " LIMIT " + p.getKey() + " OFFSET " + p.getValue();
+            String params = sql + offsetLimit;
+            double takeTime = 0D;
+            double[] takeTimeArray = new double[3];
+            for (int i = 0; i < 3; i++) {
+                String s = HttpTools.doPost("http://localhost:8092/haiyan-server/resource/test/customSQL", params);
+                takeTimeArray[i] = JSON.parseObject(s).getDouble("timeout");
+                takeTime += takeTimeArray[i];
+            }
+            System.out.println(p.toString() + " : " + takeTimeArray[0] + " + " + takeTimeArray[1] + " + " + takeTimeArray[2] + " / 3 = " + StringTools.getValFormat(String.valueOf((takeTime / 3)), 4) + " s");
+        });
+
+    }
+
+    private static void webAutoTest() throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", "E:\\Dev Tools\\browser_driver\\chromedriver.exe");
         WebDriver webDriver = new ChromeDriver();
         webDriver.manage().window().maximize();
@@ -238,4 +304,6 @@ public class HttpTools {
         Thread.sleep(1000);
         webDriver.quit();
     }
+
+
 }

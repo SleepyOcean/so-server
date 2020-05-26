@@ -2,8 +2,10 @@ package com.sleepy.blog.controller;
 
 import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.blog.entity.ArticleEntity;
+import com.sleepy.blog.entity.CollectionEntity;
 import com.sleepy.blog.service.PostService;
-import com.sleepy.blog.vo.PostVO;
+import com.sleepy.blog.vo.article.CollectionVO;
+import com.sleepy.blog.vo.article.PostVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,5 +57,15 @@ public class PostController {
     @PostMapping("/tags")
     public CommonDTO<String> getTags(@RequestBody PostVO vo) {
         return postService.getTags(vo);
+    }
+
+    @PostMapping("/collection-get")
+    public CommonDTO<CollectionEntity> getCollections(@RequestBody PostVO vo) {
+        return postService.getCollections(vo);
+    }
+
+    @PostMapping("/collection-save")
+    public CommonDTO<CollectionEntity> saveCollections(@RequestBody CollectionVO vo) {
+        return postService.saveCollections(vo);
     }
 }

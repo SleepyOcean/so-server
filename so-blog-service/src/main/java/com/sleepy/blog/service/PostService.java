@@ -2,7 +2,9 @@ package com.sleepy.blog.service;
 
 import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.blog.entity.ArticleEntity;
-import com.sleepy.blog.vo.PostVO;
+import com.sleepy.blog.entity.CollectionEntity;
+import com.sleepy.blog.vo.article.CollectionVO;
+import com.sleepy.blog.vo.article.PostVO;
 
 import java.io.IOException;
 
@@ -74,4 +76,20 @@ public interface PostService {
      * @return
      */
     CommonDTO<String> getTags(PostVO vo);
+
+    /**
+     * 获取专栏信息
+     *
+     * @param vo
+     * @return
+     */
+    CommonDTO<CollectionEntity> getCollections(PostVO vo);
+
+    /**
+     * 新建专栏
+     *
+     * @param vo
+     * @return
+     */
+    CommonDTO<CollectionEntity> saveCollections(CollectionVO vo);
 }

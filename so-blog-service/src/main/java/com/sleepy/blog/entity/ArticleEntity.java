@@ -58,8 +58,8 @@ public class ArticleEntity {
     @Column(name = "hotRate", columnDefinition = "INT COMMENT '热度(赞👍)'")
     private Integer hotRate = 0;
 
-    @Column(name = "collection", columnDefinition = "VARCHAR(255) COMMENT '专栏'")
-    private String collection;
+    @Column(name = "collection", columnDefinition = "INT COMMENT '专栏'")
+    private Integer collection;
 
     @Column(name = "source", columnDefinition = "VARCHAR(255) COMMENT '文章来源 -> 【原创 | 转载：网站名称：url】'")
     private String source;
