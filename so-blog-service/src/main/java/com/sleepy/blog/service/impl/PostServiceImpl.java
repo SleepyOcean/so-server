@@ -12,7 +12,9 @@ import com.sleepy.blog.service.CacheService;
 import com.sleepy.blog.service.PostService;
 import com.sleepy.blog.vo.article.CollectionVO;
 import com.sleepy.blog.vo.article.PostVO;
+import com.sleepy.common.model.MapModel;
 import com.sleepy.common.tools.ClassTools;
+import com.sleepy.common.tools.CommonTools;
 import com.sleepy.common.tools.DateTools;
 import com.sleepy.common.tools.StringTools;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +26,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 文章发布服务接口实现
@@ -85,6 +85,8 @@ public class PostServiceImpl implements PostService {
         entity.setContent(vo.getContent());
         entity.setSummary(vo.getSummary());
         entity.setCollection(vo.getCollection());
+        entity.setSource(vo.getSource());
+        entity.setPrivacy(vo.getPrivacy());
         if (StringTools.isNotNullOrEmpty(vo.getContentImg())) {
             entity.setContentImg(vo.getContentImg());
         }
@@ -104,7 +106,8 @@ public class PostServiceImpl implements PostService {
             tagRepository.save(tag);
         }
         result.setResult(id);
-
+        List<CollectionEntity> collections = collectionRepository.findAllByIdIn(Arrays.asList(vo.getCollection()));
+        result.setExtra(CommonTools.getCustomMap(new MapModel("collections", collections.stream().collect(Collectors.toMap(CollectionEntity::getId, c -> c)))));
         return result;
     }
 

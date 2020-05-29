@@ -20,4 +20,12 @@ public interface CollectionRepository extends JpaRepository<CollectionEntity, St
      * @return
      */
     List<CollectionEntity> findAllByNameLike(String keyword);
+
+    /**
+     * 提供ID数组查找专栏列表
+     *
+     * @param ids
+     * @return
+     */
+    List<CollectionEntity> findAllByIdIn(List<String> ids);
 }

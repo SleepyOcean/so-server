@@ -16,7 +16,9 @@ public class PostVO {
     private String summary;
     private String coverImg;
     private String contentImg;
-    private Integer collection;
+    private String collection;
+    private String source;
+    private Integer privacy;
     private String tags;
     private String date;
     private String keyword;
