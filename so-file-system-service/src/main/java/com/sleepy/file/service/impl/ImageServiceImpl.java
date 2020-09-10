@@ -147,6 +147,7 @@ public class ImageServiceImpl implements ImageService {
         }
         result.put("id", imageId);
         result.put("url", Constant.IMG_SERVER_URL_PLACEHOLDER + imageId);
+        result.put("imgUrl", Constant.IMG_SERVER_URL_PREFIX + imageId);
         return new JSONObject(result).toJSONString();
     }
 
