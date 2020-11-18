@@ -31,9 +31,11 @@ public class MovieDTO extends TransferDTO {
     private String tags;
     private String series;
     private String intro;
+    private String postUrl;
     private String postUrlVertical;
     private String postUrlHorizon;
     private String captureUrls;
+    private String trailerUrls;
     private String updateTime;
     private String note;
     private String downloadLinks;
@@ -148,6 +150,11 @@ public class MovieDTO extends TransferDTO {
         return this;
     }
 
+    public MovieDTO setPostUrl(String postUrl) {
+        this.postUrl = postUrl;
+        return this;
+    }
+
     public MovieDTO setPostUrlVertical(String postUrlVertical) {
         this.postUrlVertical = postUrlVertical;
         return this;
@@ -160,6 +167,11 @@ public class MovieDTO extends TransferDTO {
 
     public MovieDTO setCaptureUrls(String captureUrls) {
         this.captureUrls = captureUrls;
+        return this;
+    }
+
+    public MovieDTO setTrailerUrls(String trailerUrls) {
+        this.trailerUrls = trailerUrls;
         return this;
     }
 

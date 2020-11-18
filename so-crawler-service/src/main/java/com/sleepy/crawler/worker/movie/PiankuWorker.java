@@ -4,24 +4,20 @@ import com.alibaba.fastjson.JSON;
 import com.sleepy.common.model.MapModel;
 import com.sleepy.common.tools.CommonTools;
 import com.sleepy.common.tools.FileTools;
+import com.sleepy.common.tools.ImageTools;
 import com.sleepy.crawler.dto.MovieDTO;
 import com.sleepy.crawler.dto.TransferDTO;
 import com.sleepy.crawler.worker.CrawlerWork;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
+import java.io.File;
 import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 抓取片库网资源
@@ -29,31 +25,68 @@ import java.util.Map;
  * @author gehoubao
  * @create 2020-10-21 20:34
  **/
+@Component
 public class PiankuWorker implements CrawlerWork {
+    private String sourceUrl = "https://www.pianku.tv";
+    private Set<String> downloadIds = new HashSet<>();
+    private List<String> errorUrl = new ArrayList<>();
+    private DoubanWorker doubanWorker = new DoubanWorker();
+    private int lastOutputPageIndex = 1;
+    @Value("${startPage:1}")
+    private int startPage;
+    @Value("${outPutPath:./dataset}")
+    private String outputPath;
+
+    public static void main(String[] args) {
+        System.out.println();
+    }
 
     @Override
     public List<TransferDTO> produce() throws IOException {
-        List<TransferDTO> movies = new ArrayList<>();
-        String sourceUrl = "https://www.pianku.tv";
+        System.out.println("爬取『片库网』数据--开始");
+        List<TransferDTO> movieSet = new ArrayList<>();
         String baseUrlPrefix = sourceUrl + "/mv/----number--";
-
-        long totalPage = getTotalPage("https://www.pianku.tv/mv/");
-
-        for (int i = 0; i < 1; i++) {
-            Document doc = Jsoup.connect(baseUrlPrefix + i + ".html").get();
+        boolean sumPrintFlag = true;
+        long totalPage = getTotalPage(baseUrlPrefix + "1.html");
+        for (int i = startPage; i < 2; i++) {
+            lastOutputPageIndex = i;
+            String currentPageUrl = baseUrlPrefix + i + ".html";
+            Document doc = Jsoup.connect(currentPageUrl).get();
             List<Element> pageContentList = doc.getElementsByClass("content-list").get(0).getElementsByTag("li");
-            pageContentList.forEach(e -> {
-                String itemDetailPageUrl = sourceUrl + e.getElementsByTag("a").get(1).attr("href");
-                try {
+            if (i == 1 && sumPrintFlag) {
+                System.out.println(String.format("总页数：%s， 每页条数：%s， 预估总数据条数： %s", totalPage, pageContentList.size(), totalPage * pageContentList.size()));
+                sumPrintFlag = false;
+            }
+            System.out.println(String.format("当前数据网址：%s", currentPageUrl));
+            List<TransferDTO> currentPageData = getCurrentPageInfo(pageContentList.subList(20, 25));
+            movieSet.addAll(currentPageData);
+
+            String data = JSON.toJSONString(currentPageData);
+            System.out.println(String.format("当前数据网址：%s, 数据写入完成~ 数据输出：", currentPageUrl, data));
+        }
+        System.out.println("爬取『片库网』数据--结束");
+        return movieSet;
+    }
+
+    private List<TransferDTO> getCurrentPageInfo(List<Element> pageContentList) {
+        List<TransferDTO> movies = new ArrayList<>();
+        for (Element e : pageContentList) {
+            String itemDetailPageUrl = sourceUrl + e.getElementsByTag("a").get(1).attr("href");
+            String uuid = itemDetailPageUrl.substring(itemDetailPageUrl.lastIndexOf("/") + 1, itemDetailPageUrl.lastIndexOf(".html"));
+            try {
+                if (!downloadIds.contains(uuid)) {
                     MovieDTO data = getMovieDetail(itemDetailPageUrl);
                     movies.add(data);
                     System.out.println(String.format("index: %s, name: %s", movies.size(), data.getName()));
+                    downloadIds.add(data.getUuid());
                     Thread.sleep(10000);
-                } catch (IOException | InterruptedException ioException) {
-                    ioException.printStackTrace();
                 }
-            });
+            } catch (Exception exception) {
+                System.out.println(String.format("出错了：[%s]%s", itemDetailPageUrl, exception.getMessage()));
+                errorUrl.add(itemDetailPageUrl);
+            }
         }
+        FileTools.writeToString(outputPath + File.separator + "movie-all-dataset.json", JSON.toJSONString(movies));
         return movies;
     }
 
@@ -66,8 +99,11 @@ public class PiankuWorker implements CrawlerWork {
 
         String coverUrl = detailPage.getElementsByClass("cover").get(0).getElementsByTag("img").get(0).attr("src");
         String name = detailPage.getElementsByClass("main-ui-meta").get(0).getElementsByTag("h1").text();
-        String originalName = name.substring(name.indexOf(" ") + 1, name.lastIndexOf(" "));
         String chineseName = name.substring(0, name.indexOf(" "));
+        String originalName = chineseName;
+        if (name.split(" ").length > 2) {
+            originalName = name.substring(name.indexOf(" ") + 1, name.lastIndexOf(" "));
+        }
         String publishYear = name.substring(name.lastIndexOf(" "), name.length()).substring(2, 6);
         List<Element> details = detailPage.getElementsByClass("main-ui-meta").get(0).getElementsByTag("div");
         String uuid = itemDetailPageUrl.substring(itemDetailPageUrl.lastIndexOf("/") + 1, itemDetailPageUrl.lastIndexOf(".html"));
@@ -99,10 +135,10 @@ public class PiankuWorker implements CrawlerWork {
                         scoreFormat.append(" " + scoreSplit[scoreSplit.length - 1]);
                     }
                     scoreFormat.append(" / ");
-                    if (s.contains("豆瓣")) {
+                    if (s.contains("豆瓣") && !s.contains("N/A")) {
                         doubanStar = scoreSplit[2];
                         doubanLink = detail.getElementsByTag("a").get(0).attr("href");
-                    } else if (s.contains("IMDB")) {
+                    } else if (s.contains("IMDB") && !s.contains("N/A")) {
                         starIMDB = scoreSplit[2];
                     }
                 }
@@ -118,7 +154,7 @@ public class PiankuWorker implements CrawlerWork {
             else if (detailText.contains("类型："))
                 movieType = detailText.substring(3);
             else if (detailText.contains("主演："))
-                actor = detailText.substring(3);
+                actor = detailText.substring(3).replace("展开...", "").replace("...收起", "");
             else if (detailText.contains("导演："))
                 director = detailText.substring(3);
             else if (detailText.contains("编剧："))
@@ -187,8 +223,43 @@ public class PiankuWorker implements CrawlerWork {
                 .setNote(note)
                 .setType(movieType)
                 .setLinkDouban(doubanLink)
-                .setPostUrlVertical(coverUrl)
+                .setPostUrl(coverUrl)
                 .setDownloadLinks(JSON.toJSONString(downloadList));
+
+        String currentMoviePath = outputPath + File.separator + data.getPublishYear()
+                + String.format(" - (%s) %s.%s", data.getChineseName(), data.getOriginalName(), data.getPublishYear());
+        if (!StringUtils.isEmpty(doubanLink)) {
+            Map<String, Object> doubanPicLinkMap = doubanWorker.getMoviePicMap(doubanLink);
+            data.setPostUrlVertical(doubanPicLinkMap.get("postList").toString())
+                    .setPostUrlHorizon(doubanPicLinkMap.get("wallpaperList").toString())
+                    .setCaptureUrls(doubanPicLinkMap.get("videoCutList").toString());
+            data.setTrailerUrls(JSON.toJSONString(doubanWorker.getMovieTrailerLinkList(doubanLink)));
+
+//            for (String imgUrl : JSON.parseArray(data.getCaptureUrls(), String.class)) {
+//                ImageTools.downloadImg(imgUrl, currentMoviePath + File.separator + "capture", imgUrl.substring(imgUrl.lastIndexOf("/") + 1, imgUrl.lastIndexOf(".")));
+//            }
+            int size = 0;
+            for (String imgUrl : JSON.parseArray(data.getPostUrlVertical(), String.class)) {
+                ImageTools.downloadImg(imgUrl, currentMoviePath + File.separator + "post", imgUrl.substring(imgUrl.lastIndexOf("/") + 1, imgUrl.lastIndexOf(".")));
+                if (size > 3) {
+                    size = 0;
+                    break;
+                } else {
+                    size++;
+                    continue;
+                }
+            }
+            for (String imgUrl : JSON.parseArray(data.getPostUrlHorizon(), String.class)) {
+                ImageTools.downloadImg(imgUrl, currentMoviePath + File.separator + "wallpaper", imgUrl.substring(imgUrl.lastIndexOf("/") + 1, imgUrl.lastIndexOf(".")));
+                if (size > 3) {
+                    size = 0;
+                    break;
+                } else {
+                    size++;
+                    continue;
+                }
+            }
+        }
 
         if (StringUtils.isEmpty(doubanStar)) {
             data.setScoreDouban("N/A");
@@ -200,7 +271,14 @@ public class PiankuWorker implements CrawlerWork {
         } else {
             data.setScoreIMDB(starIMDB);
         }
+        FileTools.writeToString(currentMoviePath + File.separator + "index.json", JSON.toJSONString(data));
         return data;
+    }
+
+    public void printLastLog() {
+        FileTools.writeToString(outputPath + File.separator + "error-url-list.json", JSON.toJSONString(errorUrl));
+        FileTools.writeToString(outputPath + File.separator + "downloaded-id-list.json", JSON.toJSONString(downloadIds));
+        FileTools.writeToString(outputPath + File.separator + "last-page-index.json", lastOutputPageIndex + "");
     }
 
     private String trimIntroToJsonArrayString(String intro) {
@@ -213,11 +291,17 @@ public class PiankuWorker implements CrawlerWork {
             char a = intro.charAt(i);
             char b = intro.charAt(i + 1);
             if (a == ' ' && b == ' ') {
-                intros.add(intro.substring(lastIndex, i).trim());
+                String introStr = intro.substring(lastIndex, i).trim();
+                if (!StringUtils.isEmpty(introStr)) {
+                    intros.add(introStr);
+                }
                 lastIndex = i + 1;
             }
         }
-        intros.add(intro.substring(lastIndex, intro.length() - 1).trim());
+        String introStr = intro.substring(lastIndex, intro.length() - 1).trim();
+        if (!StringUtils.isEmpty(introStr)) {
+            intros.add(introStr);
+        }
         return JSON.toJSONString(intros);
     }
 
@@ -226,13 +310,5 @@ public class PiankuWorker implements CrawlerWork {
         List<Element> list = firstPage.getElementsByClass("pages").get(0).getAllElements();
         long page = Long.parseLong(list.get(list.size() - 2).text().substring(2));
         return page;
-    }
-
-    public static void main(String[] args) throws IOException, IllegalBlockSizeException, NoSuchPaddingException, BadPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
-//        new PiankuWorker().getMovieDetail("https://www.pianku.tv/mv/wNiNWZxMmM.html");
-        String data = JSON.toJSONString(new PiankuWorker().produce());
-        FileTools.writeToString("G:\\movieTestData.json", data);
-//        new PiankuWorker().trimIntroToJsonArrayString("　　2003年，伊拉克战争爆发。萨达姆政府受到重创，大规模杀伤性武器（WMD）成为美国出兵伊拉克的有力借口。罗伊·米勒（马特·戴蒙 Matt Damon 饰）所率领的小分队奉命在伊拉克境内寻找WMD，然而无数次的搜寻皆无所获，这令米勒对线报的来源心生疑惑。某次行动中，他遇到当地的独腿男子法哈迪，从对方口中米勒得知一众伊拉克关键人物正在某地集会，行动中意外发现扑克牌通缉令上的艾尔·拉威（Yigal Naor 饰）也在其中，而艾尔·拉威似乎和美国政府有着错综复杂的关系。米勒不顾劝阻展开独立调查，发现所谓的WMD不过是包藏了无数丑恶真相的谎言而已……\n" +
-//                "　　本片根据《华盛顿邮报》驻巴格达记者拉吉夫·产德拉斯卡兰（Rajiv Chandrasekaran）的作品《翡翠城的帝王生活：伊拉克绿色地带深处》改编。");
     }
 }

@@ -3,9 +3,14 @@ package com.sleepy.common.tools;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.FileUtils;
 import org.springframework.util.Base64Utils;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * 图片工具类
@@ -51,9 +56,33 @@ public class ImageTools {
         return dest;
     }
 
+    public static void downloadImg(String url, String savePath, String name) throws IOException {
+        String suffix = url.lastIndexOf('.') > 0 ? url.substring(url.lastIndexOf('.')) : "";
+        if (suffix.contains("webp") || StringUtils.isEmpty(suffix)) {
+            suffix = ".jpg";
+        }
+        name += suffix;
+        String localSavePath = savePath + File.separator + name;
+        URL url1 = new URL(url);
+        URLConnection uc = url1.openConnection();
+        File file = new File(localSavePath);
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+        try (InputStream inputStream = uc.getInputStream()) {
+            FileOutputStream out = new FileOutputStream(localSavePath);
+            int j = 0;
+            while ((j = inputStream.read()) != -1) {
+                out.write(j);
+            }
+        }
+    }
+
     public static void main(String[] args) throws IOException {
-        String src = FileTools.readToString("E:\\Dev Tools\\DockerFile\\ImageServer\\test");
-        String dest = "E:\\Dev Tools\\DockerFile\\ImageServer\\home-bg.jpg";
-        base64ToImgFile(src, dest);
+        downloadImg("https://img9.doubanio.com/view/photo/r/public/p2413297334.webp",
+                "G:\\test-data\\2002 - (谍影重重) The Bourne Identity.2002\\capture", "幽灵公主");
     }
 }
