@@ -99,7 +99,7 @@ public class DoubanWorker implements CrawlerWork {
                     Document trailerDoc = Jsoup.connect(trailerPage).get();
                     String trailerLink = trailerDoc.getElementsByTag("source").get(0).attr("src");
                     movieTrailerList.add(trailerLink);
-                    Thread.sleep(5000);
+                    Thread.sleep(2000);
                 }
             }
         } catch (IOException | InterruptedException e) {

@@ -15,5 +15,5 @@ public interface CrawlerWork {
      *
      * @return
      */
-    List<TransferDTO> produce() throws IOException;
+    List<TransferDTO> produce() throws IOException, InterruptedException;
 }

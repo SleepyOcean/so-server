@@ -8,6 +8,7 @@ import com.sleepy.common.tools.ImageTools;
 import com.sleepy.crawler.dto.MovieDTO;
 import com.sleepy.crawler.dto.TransferDTO;
 import com.sleepy.crawler.worker.CrawlerWork;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -17,7 +18,10 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 抓取片库网资源
@@ -26,70 +30,175 @@ import java.util.*;
  * @create 2020-10-21 20:34
  **/
 @Component
+@Slf4j
 public class PiankuWorker implements CrawlerWork {
     private String sourceUrl = "https://www.pianku.tv";
-    private Set<String> downloadIds = new HashSet<>();
-    private List<String> errorUrl = new ArrayList<>();
+    private String detailUrlPrefix = "https://www.pianku.tv/mv/";
+    private List<String> downloadIds = new ArrayList<>();
+    private List<String> errorIds = new ArrayList<>();
     private DoubanWorker doubanWorker = new DoubanWorker();
-    private int lastOutputPageIndex = 1;
-    @Value("${startPage:1}")
-    private int startPage;
+    private int failedContinuesTimes = 0;
+    private boolean doubanRelationDownload = false;
+    private int lastOutputDetialIndex = 1;
+    @Value("${failedContinuesThreshold:10}")
+    private int failedContinuesThreshold;
+    @Value("${startIndex:1}")
+    private int startIndex;
     @Value("${outPutPath:./dataset}")
     private String outputPath;
 
-    public static void main(String[] args) {
-        System.out.println();
-    }
-
     @Override
-    public List<TransferDTO> produce() throws IOException {
-        System.out.println("爬取『片库网』数据--开始");
-        List<TransferDTO> movieSet = new ArrayList<>();
-        String baseUrlPrefix = sourceUrl + "/mv/----number--";
-        boolean sumPrintFlag = true;
-        long totalPage = getTotalPage(baseUrlPrefix + "1.html");
-        for (int i = startPage; i < 2; i++) {
-            lastOutputPageIndex = i;
-            String currentPageUrl = baseUrlPrefix + i + ".html";
-            Document doc = Jsoup.connect(currentPageUrl).get();
-            List<Element> pageContentList = doc.getElementsByClass("content-list").get(0).getElementsByTag("li");
-            if (i == 1 && sumPrintFlag) {
-                System.out.println(String.format("总页数：%s， 每页条数：%s， 预估总数据条数： %s", totalPage, pageContentList.size(), totalPage * pageContentList.size()));
-                sumPrintFlag = false;
-            }
-            System.out.println(String.format("当前数据网址：%s", currentPageUrl));
-            List<TransferDTO> currentPageData = getCurrentPageInfo(pageContentList.subList(20, 25));
-            movieSet.addAll(currentPageData);
+    public List<TransferDTO> produce() throws IOException, InterruptedException {
+        restoreDownloadData();
 
-            String data = JSON.toJSONString(currentPageData);
-            System.out.println(String.format("当前数据网址：%s, 数据写入完成~ 数据输出：", currentPageUrl, data));
+        log.info("=============获取所有页面详情地址-开始=============");
+        List<String> allDetailUrl = new ArrayList<>();
+        try {
+            allDetailUrl = JSON.parseArray(FileTools.readToString(outputPath + File.separator + "all-detail-uuid-list.json"), String.class);
+            if (null == allDetailUrl || allDetailUrl.isEmpty()) {
+                allDetailUrl = getAllItemDetailPageUrl();
+                FileTools.writeString(outputPath + File.separator + "all-detail-uuid-list.json", JSON.toJSONString(allDetailUrl));
+            }
+        } catch (Exception e) {
+            log.info(String.format("获取所有页面详情地址-失败，原因：%s", e.getMessage()));
+            return new ArrayList<>();
         }
-        System.out.println("爬取『片库网』数据--结束");
+        log.info("=============获取所有页面详情地址-完成=============");
+        log.info(String.format("总数据条数： %s", allDetailUrl.size()));
+
+        log.info("=============爬取『片库网』数据--开始=============");
+        List<TransferDTO> movieSet = new ArrayList<>();
+        boolean lastFailed = false;
+
+        for (int i = startIndex; i < allDetailUrl.size(); i++) {
+            // 连续失败超过指定阈值，则停止任务
+            if (failedContinuesTimes > failedContinuesThreshold) {
+                return movieSet;
+            }
+            String detailUUID = allDetailUrl.get(i);
+            String itemDetailPageUrl = detailUrlPrefix + detailUUID + ".html";
+            try {
+                if (!downloadIds.contains(detailUUID)) {
+                    MovieDTO data = getMovieDetail(itemDetailPageUrl);
+                    log.info(String.format("index: %s, name: %s", i, data.getName()));
+                    downloadIds.add(data.getUuid());
+                    movieSet.add(data);
+                    lastOutputDetialIndex = i;
+                    Thread.sleep(2000);
+                }
+            } catch (Exception exception) {
+                log.info(String.format("出错了：[%s]%s", itemDetailPageUrl, exception.getMessage()));
+                errorIds.add(detailUUID);
+                if (lastFailed) {
+                    failedContinuesTimes++;
+                } else {
+                    failedContinuesTimes = 0;
+                }
+            }
+        }
+
+        log.info("=============爬取『片库网』数据--结束=============");
         return movieSet;
     }
 
-    private List<TransferDTO> getCurrentPageInfo(List<Element> pageContentList) {
-        List<TransferDTO> movies = new ArrayList<>();
-        for (Element e : pageContentList) {
-            String itemDetailPageUrl = sourceUrl + e.getElementsByTag("a").get(1).attr("href");
-            String uuid = itemDetailPageUrl.substring(itemDetailPageUrl.lastIndexOf("/") + 1, itemDetailPageUrl.lastIndexOf(".html"));
-            try {
-                if (!downloadIds.contains(uuid)) {
-                    MovieDTO data = getMovieDetail(itemDetailPageUrl);
-                    movies.add(data);
-                    System.out.println(String.format("index: %s, name: %s", movies.size(), data.getName()));
-                    downloadIds.add(data.getUuid());
-                    Thread.sleep(10000);
-                }
-            } catch (Exception exception) {
-                System.out.println(String.format("出错了：[%s]%s", itemDetailPageUrl, exception.getMessage()));
-                errorUrl.add(itemDetailPageUrl);
-            }
+    /**
+     * 恢复之前已下载的记录及错误的记录
+     *
+     * @throws IOException
+     */
+    private void restoreDownloadData() {
+        log.info("恢复历史下载记录--开始");
+        String downloadedListJson = null;
+        try {
+            downloadedListJson = FileTools.readToString(outputPath + File.separator + "downloaded-id-list.json");
+            downloadIds = JSON.parseArray(downloadedListJson, String.class);
+        } catch (IOException e) {
+            log.info("未发现已下载的历史记录！");
         }
-        FileTools.writeToString(outputPath + File.separator + "movie-all-dataset.json", JSON.toJSONString(movies));
-        return movies;
+        if (null == downloadIds) {
+            downloadIds = new ArrayList<>();
+        }
+
+        String errorListJson = null;
+        try {
+            errorListJson = FileTools.readToString(outputPath + File.separator + "error-id-list.json");
+            List<String> errorIdsRecord = JSON.parseArray(errorListJson, String.class);
+            if (null != errorIdsRecord && !errorIdsRecord.isEmpty()) {
+                // 恢复上次失败的下载
+                errorIdsRecord.forEach(uuid -> {
+                    try {
+                        if (!downloadIds.contains(uuid)) {
+                            String itemDetailPageUrl = detailUrlPrefix + uuid + ".html";
+
+                            MovieDTO data = getMovieDetail(itemDetailPageUrl);
+                            log.info(String.format("恢复下载成功，name: %s", data.getName()));
+                            downloadIds.add(data.getUuid());
+                            Thread.sleep(2000);
+                        }
+                    } catch (Exception e) {
+                        log.info(String.format("恢复下载出错了：[%s]%s", uuid, e.getMessage()));
+                        errorIds.add(uuid);
+                    }
+                });
+            }
+        } catch (IOException e) {
+            log.info("未发现下载失败的历史记录！");
+        }
+
+        try {
+            lastOutputDetialIndex = Integer.parseInt(FileTools.readToString(outputPath + File.separator + "last-detail-index.json").trim());
+            if (startIndex == 1) {
+                startIndex = lastOutputDetialIndex;
+            }
+        } catch (IOException | NumberFormatException e) {
+            log.info("未发现上次下载索引！");
+        }
+
+        log.info("恢复历史下载记录--结束");
     }
 
+    /**
+     * 获取所有页的电影详情id
+     *
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    private List<String> getAllItemDetailPageUrl() throws IOException, InterruptedException {
+        List<String> urlList = new ArrayList<>();
+
+        String baseUrlPrefix = sourceUrl + "/mv/----number--";
+        long totalPage = getTotalPage(baseUrlPrefix + "1.html");
+        for (int i = 1; i < totalPage; i++) {
+            String currentPageUrl = baseUrlPrefix + i + ".html";
+            Document doc = null;
+            try {
+                doc = Jsoup.connect(currentPageUrl).get();
+            } catch (Exception e) {
+                log.info(String.format("%s页已出错了, %s", i, e.getMessage()));
+                continue;
+            }
+            List<Element> pageContentList = doc.getElementsByClass("content-list").get(0).getElementsByTag("li");
+            List<String> ids = new ArrayList<>();
+            pageContentList.forEach(e -> {
+                String itemDetailPageUrl = sourceUrl + e.getElementsByTag("a").get(1).attr("href");
+                String uuid = itemDetailPageUrl.substring(itemDetailPageUrl.lastIndexOf("/") + 1, itemDetailPageUrl.lastIndexOf(".html"));
+                ids.add(uuid);
+            });
+            urlList.addAll(ids);
+            log.info(String.format("%s页已添加完毕, %s", i, JSON.toJSON(ids)));
+            Thread.sleep(2000);
+        }
+        return urlList;
+    }
+
+    /**
+     * 获取电影详情信息，并将电影详情信息写入对应的目录的index.json文件中
+     *
+     * @param itemDetailPageUrl 电影详情页的网址
+     * @return
+     * @throws IOException
+     */
     private MovieDTO getMovieDetail(String itemDetailPageUrl) throws IOException {
         String downloadLinkUrl = itemDetailPageUrl.replace("mv", "ajax/downurl").replace(".html", "_mv/");
         Document detailPage = Jsoup.connect(itemDetailPageUrl).get();
@@ -227,17 +336,15 @@ public class PiankuWorker implements CrawlerWork {
                 .setDownloadLinks(JSON.toJSONString(downloadList));
 
         String currentMoviePath = outputPath + File.separator + data.getPublishYear()
-                + String.format(" - (%s) %s.%s", data.getChineseName(), data.getOriginalName(), data.getPublishYear());
-        if (!StringUtils.isEmpty(doubanLink)) {
+                + String.format(" - (%s) %s", data.getChineseName(), data.getOriginalName());
+
+        if (doubanRelationDownload && !StringUtils.isEmpty(doubanLink)) {
             Map<String, Object> doubanPicLinkMap = doubanWorker.getMoviePicMap(doubanLink);
             data.setPostUrlVertical(doubanPicLinkMap.get("postList").toString())
                     .setPostUrlHorizon(doubanPicLinkMap.get("wallpaperList").toString())
                     .setCaptureUrls(doubanPicLinkMap.get("videoCutList").toString());
             data.setTrailerUrls(JSON.toJSONString(doubanWorker.getMovieTrailerLinkList(doubanLink)));
 
-//            for (String imgUrl : JSON.parseArray(data.getCaptureUrls(), String.class)) {
-//                ImageTools.downloadImg(imgUrl, currentMoviePath + File.separator + "capture", imgUrl.substring(imgUrl.lastIndexOf("/") + 1, imgUrl.lastIndexOf(".")));
-//            }
             int size = 0;
             for (String imgUrl : JSON.parseArray(data.getPostUrlVertical(), String.class)) {
                 ImageTools.downloadImg(imgUrl, currentMoviePath + File.separator + "post", imgUrl.substring(imgUrl.lastIndexOf("/") + 1, imgUrl.lastIndexOf(".")));
@@ -252,7 +359,6 @@ public class PiankuWorker implements CrawlerWork {
             for (String imgUrl : JSON.parseArray(data.getPostUrlHorizon(), String.class)) {
                 ImageTools.downloadImg(imgUrl, currentMoviePath + File.separator + "wallpaper", imgUrl.substring(imgUrl.lastIndexOf("/") + 1, imgUrl.lastIndexOf(".")));
                 if (size > 3) {
-                    size = 0;
                     break;
                 } else {
                     size++;
@@ -271,14 +377,20 @@ public class PiankuWorker implements CrawlerWork {
         } else {
             data.setScoreIMDB(starIMDB);
         }
-        FileTools.writeToString(currentMoviePath + File.separator + "index.json", JSON.toJSONString(data));
+        String old = FileTools.readToString(currentMoviePath + File.separator + "index.json");
+        if (StringUtils.isEmpty(old) || !data.equals(JSON.parseObject(old, MovieDTO.class))) {
+            FileTools.writeString(currentMoviePath + File.separator + "index.json", JSON.toJSONString(data));
+        }
         return data;
     }
 
+    /**
+     * 输出任务所有记录
+     */
     public void printLastLog() {
-        FileTools.writeToString(outputPath + File.separator + "error-url-list.json", JSON.toJSONString(errorUrl));
-        FileTools.writeToString(outputPath + File.separator + "downloaded-id-list.json", JSON.toJSONString(downloadIds));
-        FileTools.writeToString(outputPath + File.separator + "last-page-index.json", lastOutputPageIndex + "");
+        FileTools.writeString(outputPath + File.separator + "error-id-list.json", JSON.toJSONString(new HashSet<>(errorIds)));
+        FileTools.writeString(outputPath + File.separator + "downloaded-id-list.json", JSON.toJSONString(new HashSet<>(downloadIds)));
+        FileTools.writeString(outputPath + File.separator + "last-detail-index.json", lastOutputDetialIndex + "");
     }
 
     private String trimIntroToJsonArrayString(String intro) {

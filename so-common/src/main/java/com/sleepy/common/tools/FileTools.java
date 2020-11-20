@@ -22,6 +22,53 @@ import java.util.Map;
  **/
 public class FileTools {
 
+    public static void main(String[] args) {
+//        // controller-service-serviceImpl代码生成
+//        generateMVCCodeFile("E:\\MicroProjects\\so-server\\so-security-starter\\src\\main\\java\\com\\sleepy\\security",
+//                "com.sleepy.security", "SecurityRole");
+
+        String dirPath = "G:\\BaiduNetdiskDownload\\26-《四驱兄弟》无印篇";
+
+        changeSuffix(dirPath);
+//        String matchPrefix = "[SC-OL][Sword Art Online][";
+//        String newPrefix = "刀剑神域.Sword.Art.Online.";
+//
+//        boolean rename = false;
+//        rename = true;
+//        batchRename(dirPath, matchPrefix, newPrefix, rename);
+    }
+
+    private static void changeSuffix(String dirPath) {
+        File dir = new File(dirPath);
+
+        for (File file : dir.listFiles()) {
+            String originName = file.getName();
+
+            String newName = originName.substring(originName.indexOf("]") + 1).substring(originName.indexOf("爆走兄弟Let's&Go!!") + 5, originName.indexOf("[64") - 9) + ".mp4";
+            file.renameTo(new File(file.getParent() + "\\" + newName));
+            System.out.println(String.format("newName=%s, oldName=%s", newName, originName));
+        }
+    }
+
+    private static void batchRename(String dirPath, String matchPrefix, String newPrefix, boolean rename) {
+        File dir = new File(dirPath);
+
+        System.out.println(dirPath);
+
+        for (File file : dir.listFiles()) {
+            String originName = file.getName();
+            String suffix = originName.substring(originName.lastIndexOf("."), originName.length());
+
+            String index = originName.substring(matchPrefix.length()).substring(0, originName.substring(matchPrefix.length()).indexOf("]"));
+            String newName = newPrefix + index + suffix;
+
+            if (rename) {
+                file.renameTo(new File(file.getParent() + "\\" + newName));
+            }
+            System.out.println(String.format("newName=%s, oldName=%s", newName, originName));
+        }
+    }
+
     public static String getProjectPath() throws IOException {
         File file = new File("");
         String filePath = file.getCanonicalPath();
@@ -40,13 +87,21 @@ public class FileTools {
             return new String(filecontent, encoding);
         } catch (Exception e) {
             LogTools.logExceptionInfo(e);
-            return null;
+            return "";
         } finally {
-            in.close();
+            if (null != null) {
+                in.close();
+            }
         }
     }
 
-    public static void writeToString(String filePath, String content) {
+    public static void writeString(String filePath, String content) {
+        StringWriter sw = new StringWriter(filePath, false);
+        sw.writeStringToFile(content);
+        sw.close();
+    }
+
+    public static void appendString(String filePath, String content) {
         StringWriter sw = new StringWriter(filePath);
         sw.writeStringToFile(content);
         sw.close();
@@ -89,14 +144,80 @@ public class FileTools {
                 .append("@Service\n" +
                         "@Slf4j\n")
                 .append("public class " + mvcName + "ServiceImpl implements " + mvcName + "Service {}");
-        writeToString(controllerFile, controllerTemplate.toString());
-        writeToString(serviceFile, serviceTemplate.toString());
-        writeToString(serviceImplFile, serviceImplTemplate.toString());
+        appendString(controllerFile, controllerTemplate.toString());
+        appendString(serviceFile, serviceTemplate.toString());
+        appendString(serviceImplFile, serviceImplTemplate.toString());
     }
 
-    public static void main(String[] args) {
-        generateMVCCodeFile("E:\\MicroProjects\\so-server\\so-security-starter\\src\\main\\java\\com\\sleepy\\security",
-                "com.sleepy.security", "SecurityRole");
+    public static boolean delete(String path) {
+        File file = new File(path);
+        // 判断目录或文件是否存在
+        if (!file.exists()) {  // 不存在返回 false
+            return false;
+        } else {
+            // 判断是否为文件
+            if (file.isFile()) {  // 为文件时调用删除文件方法
+                return deleteFile(path);
+            } else {  // 为目录时调用删除目录方法
+                return deleteDirectory(path);
+            }
+        }
+    }
+
+    /**
+     * 删除单个文件
+     *
+     * @param path 被删除文件的文件名
+     * @return 单个文件删除成功返回true，否则返回false
+     */
+    public static boolean deleteFile(String path) {
+        boolean flag = false;
+        File file = new File(path);
+        // 路径为文件且不为空则进行删除
+        if (file.isFile() && file.exists()) {
+            file.delete();
+            flag = true;
+        }
+        return flag;
+    }
+
+    /**
+     * 删除目录（文件夹）以及目录下的文件
+     *
+     * @param path 被删除目录的文件路径
+     * @return 目录删除成功返回true，否则返回false
+     */
+    public static boolean deleteDirectory(String path) {
+        //如果path不以文件分隔符结尾，自动添加文件分隔符
+        if (!path.endsWith(File.separator)) {
+            path = path + File.separator;
+        }
+        File dirFile = new File(path);
+        //如果dir对应的文件不存在，或者不是一个目录，则退出
+        if (!dirFile.exists() || !dirFile.isDirectory()) {
+            return false;
+        }
+        boolean flag = true;
+        //删除文件夹下的所有文件(包括子目录)
+        File[] files = dirFile.listFiles();
+        for (int i = 0; i < files.length; i++) {
+            //删除子文件
+            if (files[i].isFile()) {
+                flag = deleteFile(files[i].getAbsolutePath());
+                if (!flag) break;
+            } //删除子目录
+            else {
+                flag = deleteDirectory(files[i].getAbsolutePath());
+                if (!flag) break;
+            }
+        }
+        if (!flag) return false;
+        //删除当前目录
+        if (dirFile.delete()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -264,6 +385,10 @@ public class FileTools {
         FileOutputStream fos;
 
         public StringWriter(String filePath) {
+            this(filePath, true);
+        }
+
+        public StringWriter(String filePath, boolean append) {
             file = new File(filePath);
             try {
                 if (!file.getParentFile().exists()) {
@@ -272,7 +397,7 @@ public class FileTools {
                 if (!file.exists()) {
                     file.createNewFile();
                 }
-                fos = new FileOutputStream(file, true);
+                fos = new FileOutputStream(file, append);
             } catch (IOException e) {
                 LogTools.logExceptionInfo(e);
             }
