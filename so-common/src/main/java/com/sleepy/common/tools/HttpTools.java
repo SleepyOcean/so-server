@@ -8,7 +8,6 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.sleepy.common.model.MapModel;
 import lombok.SneakyThrows;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -232,8 +231,8 @@ public class HttpTools {
 
     public static void main(String[] args) throws IOException {
         System.setProperty("org.apache.commons.logging.LogFactory", "org.apache.commons.logging.impl.LogFactoryImpl");
-        LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");
-        LogFactory.getFactory().setAttribute("org.apache.commons.logging.simplelog.defaultlog", "error");
+//        LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");
+//        LogFactory.getFactory().setAttribute("org.apache.commons.logging.simplelog.defaultlog", "error");
 //        webAutoTest();
 //        requestTest();
         offsetTest();
