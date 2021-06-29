@@ -1,10 +1,13 @@
 package com.sleepy.media.theater.processor;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
+import com.sleepy.common.tools.FileTools;
+import me.xdrop.fuzzywuzzy.FuzzySearch;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 影视资源文档重整processor
@@ -13,24 +16,92 @@ import java.util.Set;
  * @create 2021-01-21 18:39
  **/
 public class MovieFileProcessor {
-    Set<String> videoFormat = Sets.newHashSet(".mkv", ".mp4", ".m2ts", ".avi");
+    Set<String> videoFormat = Sets.newHashSet(".mkv", ".mp4", ".m2ts", ".avi", ".MKV", ".m4v");
     Set<String> formatSet = new HashSet<>();
+    List<String> errorList = new ArrayList<>();
+    TMDbProcessor tmDbProcessor = new TMDbProcessor();
+    private static String CACHE_PATH = "G:\\MovieFetchLab\\Cache\\";
 
-    public void regular1(String path) {
-
+    public Map<String, String> getMetaFileMap(String path) {
+        Map<String, String> result = new HashMap<>(1024);
         File dir = new File(path);
+        getMetaVideoDir(dir, result);
+        return result;
+    }
 
-        if (dir.isFile() || dir.listFiles() == null) return;
+    private void getMetaVideoDir(File dir, Map<String, String> fileMap) {
+        if (dir.isDirectory()) {
+            for (File file : dir.listFiles()) {
+                getMetaVideoDir(file, fileMap);
+            }
+            return;
+        }
+        String fileName = dir.getName();
+        if (videoFormat.contains(getFileType(fileName)) && !fileName.contains("trailer")) {
+            File parentFile = dir.getParentFile();
+            String key = parentFile.getName().substring(parentFile.getName().indexOf("(") + 1, parentFile.getName().indexOf(")"));
+            fileMap.put(key, dir.getParent());
+        }
+    }
 
-        for (File file : dir.listFiles()) {
-            if (file.isFile()) {
-                String fileType = getFileType(file.getName());
-                formatSet.add(fileType);
-                if (videoFormat.contains(fileType.toLowerCase())) {
-                    renameFile(file, file.getName().toUpperCase());
+    public void regularOffline(String path) {
+        Map<String, String> resultMap = new HashMap<>(1024);
+        Map<String, String> unMatchMap = new HashMap<>(1024);
+
+        File targetRoot = new File(path);
+        Map<String, File> targetMap = new HashMap<>(1024);
+        getTargetVideoDir(targetRoot, targetMap);
+
+        File sourceRoot = new File("G:\\theater-tab\\0-Collection");
+        Map<String, String> sourceMap = new HashMap<>(1024);
+        getMetaVideoDir(sourceRoot, sourceMap);
+        for (String targetKey : targetMap.keySet()) {
+            int maxRatio = 0;
+            String matchKey = "";
+            for (String sourceKey : sourceMap.keySet()) {
+                int ratio = FuzzySearch.ratio(targetKey, sourceKey);
+                if (ratio > 10 && ratio > maxRatio) {
+                    maxRatio = ratio;
+                    matchKey = sourceKey;
                 }
+            }
+            if ("".equals(matchKey)) {
+                unMatchMap.put(targetKey, matchKey);
             } else {
-                regular1(file.getAbsolutePath());
+                resultMap.put(targetKey, matchKey);
+            }
+        }
+        System.out.println(resultMap);
+    }
+
+    public void regularOnline(String path) {
+        File root = new File(path);
+        Map<String, File> result = new HashMap<>(1024);
+        getTargetVideoDir(root, result);
+        result.forEach((key, val) -> {
+            JSONArray array = tmDbProcessor.searchMovie(key, 1);
+            JSONObject matchObj = array.getJSONObject(0);
+            System.out.println(String.format("original name: %s -> match name: %s", key.toString(), matchObj.getString("title")));
+            FileTools.writeString(CACHE_PATH + matchObj.getString("title") + ".json", matchObj.toJSONString());
+        });
+        System.out.println(result);
+    }
+
+    private void getTargetVideoDir(File dir, Map<String, File> fileMap) {
+        if (dir.isDirectory()) {
+            for (File file : dir.listFiles()) {
+                getTargetVideoDir(file, fileMap);
+            }
+            return;
+        }
+        String fileName = dir.getName();
+        if (videoFormat.contains(getFileType(fileName))) {
+            File parentFile = dir.getParentFile();
+            try {
+                String key = parentFile.getName().substring(parentFile.getName().indexOf("(") + 1, parentFile.getName().lastIndexOf(")"));
+                fileMap.put(key, dir.getParentFile());
+            } catch (Exception e) {
+                errorList.add(parentFile.getPath());
             }
         }
     }
@@ -65,10 +136,40 @@ public class MovieFileProcessor {
         return fileType;
     }
 
-    public static void main(String[] args) {
-        MovieFileProcessor processor = new MovieFileProcessor();
-        processor.regular1("G:\\Lab\\theater-part1\\1-Series(电影系列)");
-        System.out.printf(processor.formatSet.toString());
-//        processor.rename(new File("G:\\Lab\\1952 - (雨中曲) Singin'.in.the.Rain.1952\\162.雨中曲.1952.BluRay.1080p.DTS.2Audio.x264-CHD.mkv"));
+    public void findMultiVideoFile(File dir, Set<String> pathList) {
+        if (dir.isDirectory()) {
+            for (File file : dir.listFiles()) {
+                findMultiVideoFile(file, pathList);
+            }
+            return;
+        }
+        String fileName = dir.getName();
+        if (videoFormat.contains(getFileType(fileName))) {
+            int videoCount = 0;
+            for (File file : dir.getParentFile().listFiles()) {
+                if (file.isFile() && videoFormat.contains(getFileType(file.getName()))) {
+                    videoCount++;
+                }
+            }
+            if (videoCount > 1) {
+                pathList.add(dir.getParent());
+            }
+        }
+    }
+
+    public void getAllFileType(File dir, Map<String, List<String>> fileTypeMap) {
+        if (dir.isDirectory()) {
+            for (File file : dir.listFiles()) {
+                getAllFileType(file, fileTypeMap);
+            }
+            return;
+        }
+        String fileName = dir.getName();
+        List list = fileTypeMap.get(getFileType(fileName));
+        if (null == list || list.isEmpty()) {
+            list = new ArrayList();
+        }
+        list.add(dir.getAbsolutePath());
+        fileTypeMap.put(getFileType(fileName), list);
     }
 }

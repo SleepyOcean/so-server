@@ -66,12 +66,4 @@ public class FakeFileProcessor {
             }
         }
     }
-
-    public static void main(String[] args) throws IOException {
-        FakeFileProcessor processor = new FakeFileProcessor();
-        List<FakeFilePOJO> tree = processor.readFileTree("\\\\DS218plus\\theater-part2\\3-TVplay(影视剧)\\A-《绿箭侠》系列（1-8季）\\S05");
-
-        processor.writeFakeFile(tree, "G:\\假文件\\GreenArrowS05");
-        System.out.println(tree);
-    }
 }
