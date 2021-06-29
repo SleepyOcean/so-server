@@ -13,6 +13,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -25,6 +26,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -48,6 +50,36 @@ public class HttpTools {
      */
     private static int WAIT_SECOND = 5000;
     private static String UNKNOWN_IP = "unknown";
+
+
+    /**
+     * 模拟get请求接口返回json数据格式
+     *
+     * @param url
+     * @return
+     */
+    public static String doGet(String url, Map<String, Object> params) throws URISyntaxException, IOException {
+        String result = "";
+        //获取httpclient对象
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        URIBuilder uriBuilder = new URIBuilder(url);
+        params.forEach((key, value) -> {
+            uriBuilder.addParameter(key, value.toString());
+        });
+        //获取get请求对象
+        HttpGet httpGet = new HttpGet(uriBuilder.build());
+        try {
+            //发起请求
+            HttpResponse response = httpClient.execute(httpGet);
+            //获取响应中的数据
+            HttpEntity entity = response.getEntity();
+            //把entity转换成字符串
+            result = EntityUtils.toString(entity, "utf-8");
+        } catch (Exception e) {
+            LogTools.logExceptionInfo(e);
+        }
+        return result;
+    }
 
     /**
      * 模拟get请求接口返回json数据格式

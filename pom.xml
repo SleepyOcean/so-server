@@ -60,18 +60,18 @@
             <name>alibaba</name>
             <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
         </repository>
-        <!--        <repository>-->
-        <!--            <id>oceanmaven</id>-->
-        <!--            <name>ocean maven</name>-->
-        <!--            <url>http://nexus.sleepyocean.cn/repository/maven-ocean/</url>-->
-        <!--        </repository>-->
+        <repository>
+            <id>oceanmaven</id>
+            <name>ocean maven</name>
+            <url>http://nexus.sleepyocean.cn/repository/maven-ocean/</url>
+        </repository>
     </repositories>
 
-    <!--    <distributionManagement>-->
-    <!--        <repository>-->
-    <!--            <id>oceanmaven</id>-->
-    <!--            <name>ocean maven</name>-->
-    <!--            <url>http://nexus.sleepyocean.cn/repository/maven-ocean/</url>-->
-    <!--        </repository>-->
-    <!--    </distributionManagement>-->
+    <distributionManagement>
+        <repository>
+            <id>oceanmaven</id>
+            <name>ocean maven</name>
+            <url>http://nexus.sleepyocean.cn/repository/maven-ocean/</url>
+        </repository>
+    </distributionManagement>
 </project>
