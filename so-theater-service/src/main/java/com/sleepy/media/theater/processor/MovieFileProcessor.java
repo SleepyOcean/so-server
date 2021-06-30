@@ -20,7 +20,6 @@ public class MovieFileProcessor {
     Set<String> formatSet = new HashSet<>();
     List<String> errorList = new ArrayList<>();
     TMDbProcessor tmDbProcessor = new TMDbProcessor();
-    private static String CACHE_PATH = "G:\\MovieFetchLab\\Cache\\";
 
     public Map<String, String> getMetaFileMap(String path) {
         Map<String, String> result = new HashMap<>(1024);
@@ -44,15 +43,15 @@ public class MovieFileProcessor {
         }
     }
 
-    public void regularOffline(String path) {
+    public void regularOffline(String sourcePath, String targetPath) {
         Map<String, String> resultMap = new HashMap<>(1024);
         Map<String, String> unMatchMap = new HashMap<>(1024);
 
-        File targetRoot = new File(path);
+        File targetRoot = new File(targetPath);
         Map<String, File> targetMap = new HashMap<>(1024);
         getTargetVideoDir(targetRoot, targetMap);
 
-        File sourceRoot = new File("G:\\theater-tab\\0-Collection");
+        File sourceRoot = new File(sourcePath);
         Map<String, String> sourceMap = new HashMap<>(1024);
         getMetaVideoDir(sourceRoot, sourceMap);
         for (String targetKey : targetMap.keySet()) {
@@ -71,10 +70,15 @@ public class MovieFileProcessor {
                 resultMap.put(targetKey, matchKey);
             }
         }
+        List<String> targetList = new ArrayList<>(targetMap.keySet());
+        List<String> sourceList = new ArrayList<>(sourceMap.keySet());
+
+        Collections.sort(targetList);
+        Collections.sort(sourceList);
         System.out.println(resultMap);
     }
 
-    public void regularOnline(String path) {
+    public void regularOnline(String path, String cachePath) {
         File root = new File(path);
         Map<String, File> result = new HashMap<>(1024);
         getTargetVideoDir(root, result);
@@ -82,7 +86,7 @@ public class MovieFileProcessor {
             JSONArray array = tmDbProcessor.searchMovie(key, 1);
             JSONObject matchObj = array.getJSONObject(0);
             System.out.println(String.format("original name: %s -> match name: %s", key.toString(), matchObj.getString("title")));
-            FileTools.writeString(CACHE_PATH + matchObj.getString("title") + ".json", matchObj.toJSONString());
+            FileTools.writeString(cachePath + matchObj.getString("title") + ".json", matchObj.toJSONString());
         });
         System.out.println(result);
     }
@@ -132,7 +136,12 @@ public class MovieFileProcessor {
     }
 
     private String getFileType(String name) {
-        String fileType = name.substring(name.lastIndexOf("."));
+        String fileType = "";
+        try {
+            fileType = name.substring(name.lastIndexOf("."));
+        } catch (Exception e) {
+            System.out.println("error: " + name);
+        }
         return fileType;
     }
 
@@ -171,5 +180,18 @@ public class MovieFileProcessor {
         }
         list.add(dir.getAbsolutePath());
         fileTypeMap.put(getFileType(fileName), list);
+    }
+
+    public void getAllVideoFile(File dir, List<String> pathList) {
+        if (dir.isDirectory()) {
+            for (File file : dir.listFiles()) {
+                getAllVideoFile(file, pathList);
+            }
+            return;
+        }
+        String fileName = dir.getName();
+        if (videoFormat.contains(getFileType(fileName))) {
+            pathList.add(dir.getAbsolutePath());
+        }
     }
 }

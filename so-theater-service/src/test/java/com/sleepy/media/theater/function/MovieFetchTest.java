@@ -18,12 +18,14 @@ public class MovieFetchTest {
 
     @Test
     public void fetchMovieForLocalMovieFile() {
-        movieFileProcessor.regularOffline("G:\\MovieFetchLab\\0-Cinema1\\0-Collection(系列收藏)");
+        String sourcePath = "E:\\Z-Cache\\1-CodeCache\\FakeFileDir\\0-Source\\0-Collection";
+        String targetPath = "E:\\Z-Cache\\1-CodeCache\\FakeFileDir\\0-Cinema1\\0-Collection(系列收藏)";
+        movieFileProcessor.regularOffline(sourcePath, targetPath);
     }
 
     @Test
     public void renameAbnormalFile() {
-        String path = "G:\\假文件\\0-Cinema1\\0-Collection(系列收藏)\\H-詹姆斯邦德007系列";
+        String path = "E:\\Z-Cache\\1-CodeCache\\FakeFileDir\\0-Cinema1\\0-Collection(系列收藏)\\H-詹姆斯邦德007系列";
     }
 
     @Test
@@ -33,6 +35,13 @@ public class MovieFetchTest {
         List<String> list = new LinkedList<String>(filePath);
         Collections.sort(list);
         System.out.printf(filePath.toString());
+    }
+
+    @Test
+    public void getAllVideoFile() {
+        List<String> fileSet = new ArrayList<>();
+        movieFileProcessor.getAllVideoFile(new File("E:\\Z-Cache\\1-CodeCache\\FakeFileDir\\0-Cinema1\\0-Collection(系列收藏)"), fileSet);
+        System.out.println(fileSet.toString());
     }
 
     @Test
