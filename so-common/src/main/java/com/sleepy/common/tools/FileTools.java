@@ -9,6 +9,7 @@ import com.drew.metadata.exif.ExifSubIFDDirectory;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -129,6 +130,23 @@ public class FileTools {
         } else {
             return false;
         }
+    }
+
+    /**
+     * 拷贝文件到指定目录的文件
+     * 源目录 + 文件名A -> 目标目录 + 文件名A
+     *
+     * @param sourceFile
+     * @param targetFile
+     * @throws IOException
+     */
+    public static void copyFileToFile(File sourceFile, File targetFile) throws IOException {
+        Files.copy(sourceFile.toPath(), targetFile.toPath());
+    }
+
+    public static void copyFileToDir(File sourceFile, File targetDir) throws IOException {
+        File target = new File(targetDir.getAbsolutePath() + File.separator + sourceFile.getName());
+        copyFileToFile(sourceFile, target);
     }
 
     /**
