@@ -18,8 +18,7 @@ public class FakeFileProcessorTest {
     @Test
     public void produceFakeFile() throws IOException {
         List<FakeFilePOJO> tree = processor.readFileTree("\\\\DS218plus\\0-Cinema1");
-
-        processor.writeFakeFile(tree, "G:\\FakeFileDir\\0-Cinema1");
+        processor.writeFakeFile(tree, "G:\\MovieFetchLab\\0-WorkDir\\Target");
         System.out.println(tree);
     }
 }
