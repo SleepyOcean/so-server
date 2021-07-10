@@ -2,7 +2,7 @@ package com.sleepy.file.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.sleepy.common.constant.HttpStatusCode;
+import com.sleepy.common.constant.HttpStatus;
 import com.sleepy.common.tools.*;
 import com.sleepy.file.common.Constant;
 import com.sleepy.file.dao.ImageDAO;
@@ -134,16 +134,16 @@ public class ImageServiceImpl implements ImageService {
                 entity.setResolutionRatio(imgMeta.get("宽") + " × " + imgMeta.get("高"));
                 entity.setImageId(imageId);
                 imageDAO.save(entity);
-                result.put("status", HttpStatusCode.OK);
+                result.put("status", HttpStatus.OK);
             } catch (Exception e) {
                 File file = new File(imgPath);
                 file.delete();
-                result.put("status", HttpStatusCode.INTERNAL_ERROR);
+                result.put("status", HttpStatus.INTERNAL_ERROR);
                 result.put("message", e.getMessage());
                 return new JSONObject(result).toJSONString();
             }
         } else {
-            result.put("status", HttpStatusCode.NOT_ACCEPTABLE);
+            result.put("status", HttpStatus.NOT_ACCEPTABLE);
         }
         result.put("id", imageId);
         result.put("url", Constant.IMG_SERVER_URL_PLACEHOLDER + imageId);
