@@ -1,8 +1,12 @@
 package com.sleepy.media.theater.controller;
 
+import com.alibaba.fastjson.JSONObject;
+import com.sleepy.common.constant.HttpStatus;
+import com.sleepy.common.http.CommonDTO;
+import com.sleepy.media.theater.constant.RegularType;
 import com.sleepy.media.theater.entity.LocalVideoEntity;
-import com.sleepy.media.theater.pojo.CommonDTO;
 import com.sleepy.media.theater.service.SoVideoService;
+import com.sleepy.media.theater.vo.VideoVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,5 +36,14 @@ public class SoVideoController {
     public CommonDTO<LocalVideoEntity> getLocalVideos(@PathVariable("videoType") String videoType,
                                                       @PathVariable("sortType") String sortType, @PathVariable("page") Integer page) {
         return soVideoService.getLocalVideos(videoType, sortType, page);
+    }
+
+    @PostMapping("/regular/moive")
+    public CommonDTO<JSONObject> regularNewMovie(@RequestBody VideoVO vo) {
+        String regularType = vo.getRegularType();
+        if (RegularType.MOVIE_TEST.name().equals(regularType) || RegularType.MOVIE_CONFIRM.name().equals(regularType)) {
+            return soVideoService.regularNewMovie(vo);
+        }
+        return CommonDTO.create(HttpStatus.OK, "Do nothing.");
     }
 }

@@ -28,7 +28,6 @@ public class MovieFileProcessor {
     List<String> errorList = new ArrayList<>();
     TMDbProcessor tmDbProcessor = new TMDbProcessor();
     FakeFileProcessor fakeFileProcessor = new FakeFileProcessor();
-    boolean confirmRename = true;
 
     public Map<String, String> getMetaFileMap(String path) {
         Map<String, String> result = new HashMap<>(1024);
@@ -56,7 +55,7 @@ public class MovieFileProcessor {
         }
     }
 
-    public void regularOffline(String sourcePath, String targetPath, String cacheFetchMap) {
+    public JSONObject regularOffline(String sourcePath, String targetPath, String cacheFetchMap, boolean confirmRename) {
         File targetRoot = new File(targetPath);
         Map<String, File> targetMap = new HashMap<>(1024);
         getTargetVideoDir(targetRoot, targetMap);
@@ -74,11 +73,18 @@ public class MovieFileProcessor {
             resultMap = getFetchKeyMap(sourceMap, targetMap);
         }
 
-        renameTargetFile(sourceMap, targetMap, resultMap);
-        copyMetaFileToTarget(sourceMap, targetMap, resultMap);
+        JSONObject renameInfo = renameTargetFile(sourceMap, targetMap, resultMap, confirmRename);
+        JSONObject copyInfo = copyMetaFileToTarget(sourceMap, targetMap, resultMap, confirmRename);
+
+        JSONObject result = new JSONObject();
+        result.put("rename", renameInfo);
+        result.put("copy", copyInfo);
+        return result;
     }
 
-    private void renameTargetFile(Map<String, String> sourceMap, Map<String, File> targetMap, Map<String, String> fetchMap) {
+    private JSONObject renameTargetFile(Map<String, String> sourceMap, Map<String, File> targetMap, Map<String, String> fetchMap, boolean confirmRename) {
+        JSONObject result = new JSONObject();
+        JSONArray info = new JSONArray();
         fetchMap.forEach((key, val) -> {
             File targetDir = targetMap.get(key);
             File sourceDir = new File(sourceMap.get(val));
@@ -92,7 +98,7 @@ public class MovieFileProcessor {
             String movieName = sourceVideoNames[0].substring(0, sourceVideoNames[0].lastIndexOf("."));
 
             // rename 之前需要将原文件信息写入 original_meta.json
-            writeMetaJsonFile(targetDir);
+            writeMetaJsonFile(targetDir, confirmRename);
 
             // 开始重命名
             File[] targetRenameFile = targetDir.listFiles(new FilenameFilter() {
@@ -107,12 +113,21 @@ public class MovieFileProcessor {
                 if (confirmRename) {
                     renameFile(file, movieName + getFileType(file.getName()));
                 }
-                System.out.println(String.format("| %s | %s | %s |", file.getName(), movieName + getFileType(file.getName()), file.getParent()));
+                JSONObject item = new JSONObject();
+                item.put("fromName", file.getName());
+                item.put("toName", movieName + getFileType(file.getName()));
+                item.put("fromParentPath", file.getParent());
+                info.add(item);
             }
         });
+        result.put("output", info);
+        return result;
     }
 
-    private void copyMetaFileToTarget(Map<String, String> sourceMap, Map<String, File> targetMap, Map<String, String> fetchMap) {
+    private JSONObject copyMetaFileToTarget(Map<String, String> sourceMap, Map<String, File> targetMap, Map<String, String> fetchMap, boolean confirmRename) {
+        JSONObject result = new JSONObject();
+        JSONArray info = new JSONArray();
+        JSONArray error = new JSONArray();
         Map<String, String> failedMap = new HashMap<>(1024);
         fetchMap.forEach((key, val) -> {
             File targetDir = targetMap.get(key);
@@ -126,9 +141,18 @@ public class MovieFileProcessor {
             });
             for (File sourceFile : sourceFiles) {
                 try {
-                    FileTools.copyFileToDir(sourceFile, targetDir);
+                    if (confirmRename) {
+                        FileTools.copyFileToDir(sourceFile, targetDir);
+                    }
+                    JSONObject item = new JSONObject();
+                    item.put("fromFile", sourceFile);
+                    item.put("toDir", targetDir);
+                    info.add(item);
                 } catch (IOException e) {
-                    failedMap.put(sourceFile.getAbsolutePath(), e.getMessage());
+                    JSONObject item = new JSONObject();
+                    item.put("fromFile", sourceFile.getAbsolutePath());
+                    item.put("errorMsg", e.getMessage());
+                    error.add(item);
                 }
             }
             // 重命名电影目录，将中文影视名替换为匹配到的中文名
@@ -138,7 +162,9 @@ public class MovieFileProcessor {
                 renameFile(targetDir, dirNewName);
             }
         });
-        FileTools.appendString("G:\\MovieFetchLab\\0-WorkDir\\error-copy-log.json", JSON.toJSONString(failedMap));
+        result.put("output", info);
+        result.put("error", error);
+        return result;
     }
 
     private Map<String, String> getFetchKeyMap(String cachePath) {
@@ -304,7 +330,7 @@ public class MovieFileProcessor {
         }
     }
 
-    public void writeMetaJsonFile(File targetDir) {
+    public void writeMetaJsonFile(File targetDir, boolean confirmRename) {
         Map<String, String> originalMeta = new HashMap<>(128);
         try {
             originalMeta.put("originalFileList", JSON.toJSONString(fakeFileProcessor.readFileTree(targetDir.getPath())));

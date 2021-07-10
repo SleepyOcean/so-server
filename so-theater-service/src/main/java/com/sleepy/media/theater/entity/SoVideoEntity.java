@@ -14,7 +14,7 @@ import java.util.List;
  * @since 2020-11-21 15:24:59
  */
 @Data
-@Document(indexName = "theater", refreshInterval = "0s")
+@Document(indexName = "theater")
 public class SoVideoEntity {
 
     @Id

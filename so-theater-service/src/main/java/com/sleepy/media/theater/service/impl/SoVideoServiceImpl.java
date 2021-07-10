@@ -1,9 +1,14 @@
 package com.sleepy.media.theater.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import com.sleepy.common.constant.HttpStatus;
+import com.sleepy.common.http.CommonDTO;
+import com.sleepy.media.theater.constant.RegularType;
 import com.sleepy.media.theater.entity.LocalVideoEntity;
-import com.sleepy.media.theater.pojo.CommonDTO;
+import com.sleepy.media.theater.processor.MovieFileProcessor;
 import com.sleepy.media.theater.processor.VideoProcessor;
 import com.sleepy.media.theater.service.SoVideoService;
+import com.sleepy.media.theater.vo.VideoVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+
+import static com.sleepy.common.request.Check.checkStr;
 
 /**
  * 视频Service实现类
@@ -23,6 +30,9 @@ public class SoVideoServiceImpl implements SoVideoService {
 
     @Autowired
     VideoProcessor videoProcessor;
+
+    @Autowired
+    MovieFileProcessor movieFileProcessor;
 
     @Override
     public void getVideoStream(HttpServletRequest request, HttpServletResponse response, String videoId) {
@@ -89,5 +99,20 @@ public class SoVideoServiceImpl implements SoVideoService {
     @Override
     public CommonDTO<LocalVideoEntity> getLocalVideos(String videoType, String sortType, Integer page) {
         return null;
+    }
+
+    @Override
+    public CommonDTO<JSONObject> regularNewMovie(VideoVO vo) {
+        boolean modify = false;
+        if (RegularType.MOVIE_CONFIRM.name().equals(vo.getRegularType())) {
+            modify = true;
+        }
+        String sourcePath = checkStr(vo.getMetaPath());
+        String targetPath = checkStr(vo.getTargetPath());
+        String targetMetaMapPath = checkStr(vo.getTargetMetaMapPath());
+
+        JSONObject result = movieFileProcessor.regularOffline(sourcePath, targetPath, targetMetaMapPath, modify);
+        result.put("fileChange", modify);
+        return CommonDTO.create(HttpStatus.OK, "check").setResult(result).build();
     }
 }

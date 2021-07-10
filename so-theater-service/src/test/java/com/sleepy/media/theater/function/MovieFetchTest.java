@@ -23,7 +23,7 @@ public class MovieFetchTest {
 
     @Test
     public void writeOriginalMetaJsonFile() throws IOException {
-        movieFileProcessor.writeMetaJsonFile(new File("\\\\DS218plus\\0-Cinema1\\2-院线上新\\The.Tomorrow.War.2021.HDR.2160p.WEB.H265-NAISU"));
+        movieFileProcessor.writeMetaJsonFile(new File("\\\\DS218plus\\0-Cinema1\\2-院线上新\\The.Tomorrow.War.2021.HDR.2160p.WEB.H265-NAISU"), false);
 //        movieFileProcessor.writeMetaJsonFile(new File("\\\\DS218plus\\0-Cinema1\\2-院线上新\\War.For.The.Planet.Of.The.Apes.2017.2160p.UHD.BluRay.x265-EMERALD"));
     }
 
@@ -39,7 +39,7 @@ public class MovieFetchTest {
         String sourcePath = "G:\\MovieFetchLab\\0-WorkDir\\Source\\电影整理版v3";
         String targetPath = DS_218_PATH + "0-Collection(系列收藏)";
         String cacheFetchMap = "G:\\MovieFetchLab\\0-WorkDir\\FetchResultMap（已整理）.json";
-        movieFileProcessor.regularOffline(sourcePath, targetPath, cacheFetchMap);
+        movieFileProcessor.regularOffline(sourcePath, targetPath, cacheFetchMap, false);
     }
 
     @Test
@@ -47,7 +47,7 @@ public class MovieFetchTest {
         String sourcePath = "G:\\MovieFetchLab\\0-WorkDir\\Source\\电影整理版v3";
         String targetPath = DS_218_PATH + "1-Movie(原盘影院)";
         String cacheFetchMap = "G:\\MovieFetchLab\\0-WorkDir\\FetchResultMap（已整理）1.json";
-        movieFileProcessor.regularOffline(sourcePath, targetPath, cacheFetchMap);
+        movieFileProcessor.regularOffline(sourcePath, targetPath, cacheFetchMap, false);
     }
 
     @Test
@@ -55,7 +55,7 @@ public class MovieFetchTest {
         String sourcePath = "G:\\MovieFetchLab\\0-WorkDir\\Source\\电影整理版v3";
         String targetPath = DS_218_PATH + "1-Series(电影系列)";
         String cacheFetchMap = "G:\\MovieFetchLab\\0-WorkDir\\FetchResultMap（已整理）2.json";
-        movieFileProcessor.regularOffline(sourcePath, targetPath, cacheFetchMap);
+        movieFileProcessor.regularOffline(sourcePath, targetPath, cacheFetchMap, false);
     }
 
     @Test
@@ -63,7 +63,7 @@ public class MovieFetchTest {
         String sourcePath = "G:\\MovieFetchLab\\0-WorkDir\\Source\\电影整理版v2";
         String targetPath = "\\\\DS218plus\\2-Sharing云盘\\Theater";
         String cacheFetchMap = "G:\\MovieFetchLab\\0-WorkDir\\FetchResultMap（已整理）3.json";
-        movieFileProcessor.regularOffline(sourcePath, targetPath, cacheFetchMap);
+        movieFileProcessor.regularOffline(sourcePath, targetPath, cacheFetchMap, false);
     }
 
     @Test
@@ -73,10 +73,11 @@ public class MovieFetchTest {
         movieFileProcessor.batchRenameMovieFileName(new File(DS_218_PATH + "1-Series(电影系列)"));
     }
 
-    private void createFakeFile() throws IOException {
+    @Test
+    public void createFakeFile() throws IOException {
         FakeFileProcessor processor = new FakeFileProcessor();
-        List<FakeFilePOJO> tree = processor.readFileTree("\\\\DS218plus\\0-Cinema1");
-        processor.writeFakeFile(tree, "G:\\MovieFetchLab\\0-WorkDir\\Target");
+        List<FakeFilePOJO> tree = processor.readFileTree("G:\\2-实验目录\\MovieLab\\0 - 源文件");
+        processor.writeFakeFile(tree, "G:\\2-实验目录\\MovieLab\\target");
     }
 
     @Test
