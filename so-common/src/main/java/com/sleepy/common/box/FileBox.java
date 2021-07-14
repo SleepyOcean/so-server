@@ -30,9 +30,10 @@ public class FileBox {
 
         int b = 2;
 
-        rename = true;
+        rename = false;
+//        rename = true;
 
-//        for (i = a; i <= b; i++)
+        for (i = a; i <= b; i++)
         createBatchRenameTask(i);
 
 //        renameByReplace();
@@ -40,7 +41,7 @@ public class FileBox {
     }
 
     public static void addSuffix() {
-        String dirPath = "\\\\DS218plus\\theater-part3\\4-Cartoon(动漫)\\1986 - (龙珠) ドラゴンボール\\1986 - 龙珠TV";
+        String dirPath = "\\\\DS218plus\\0-Cinema2\\4-Cartoon(动漫)\\《我们仍未知道那天所看见的花的名字》";
 
         File dir = new File(dirPath);
 
@@ -105,13 +106,13 @@ public class FileBox {
     }
 
     private static void createBatchRenameTask(int index) {
-        String dirPath = "\\\\DS218plus\\theater-part3\\4-Cartoon(动漫)\\1 - 动漫剧集\\《马丁的早晨》" + (index == 0 ? "" : index);
+        String dirPath = "\\\\DS218plus\\0-Cinema2\\4-Cartoon(动漫)\\《哆啦A梦》\\哆啦A梦.S0" + (index == 0 ? "" : index);
 
 //        changeSuffix(dirPath);
 
-        String matchPrefix = "马丁的早晨.Martin.Morning.E";
-        String matchSuffix = ".2003.DVD.2Audio.MiniSD-TLF";
-        String newPrefix = "Martin.Morning.E";
+        String matchPrefix = "季 (";
+        String matchSuffix = ")";
+        String newPrefix = "哆啦A梦.S0"+index+"E";
         String newSuffix = "";
 
         batchRename(dirPath, matchPrefix, matchSuffix, newPrefix, newSuffix, rename);
