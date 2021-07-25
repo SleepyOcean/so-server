@@ -26,21 +26,21 @@ public class FileBox {
 
         int i = 0;
 
-        int a = 1;
+        int a = 2;
 
         int b = 2;
 
+//        rename = false;
         rename = true;
 
 //        for (i = a; i <= b; i++)
-        createBatchRenameTask(i);
-
-//        renameByReplace();
+//        createBatchRenameTask(i);
+        renameByReplace();
 //        addSuffix();
     }
 
     public static void addSuffix() {
-        String dirPath = "\\\\DS218plus\\theater-part3\\4-Cartoon(动漫)\\1986 - (龙珠) ドラゴンボール\\1986 - 龙珠TV";
+        String dirPath = "\\\\DS218plus\\0-Cinema2\\4-Cartoon(动漫)\\《我们仍未知道那天所看见的花的名字》";
 
         File dir = new File(dirPath);
 
@@ -64,7 +64,7 @@ public class FileBox {
     }
 
     public static void renameByReplace() {
-        String dirPath = "\\\\DS218plus\\theater-part3\\4-Cartoon(动漫)\\20-《一人之下》S01-S03\\一人之下.S02";
+        String dirPath = "\\\\DS218plus\\0-Cinema2\\4-Cartoon(动漫)\\1 - 动漫剧集\\《哆啦A梦系列1》哆啦A梦";
 
         File dir = new File(dirPath);
 
@@ -86,12 +86,12 @@ public class FileBox {
 //                String newName = "四驱兄弟.S01E" + getEpisodeIndex(replaceName, prefixName, suffixName, 2) + "."
 //                        + originName.substring(originName.indexOf("「") + 1, originName.lastIndexOf("」")) + fileFormatSuffix;
 
-                String newName = originName.replace("一人之下 第二季：第", "一人之下.S02E");
-                newName = newName.substring(0, newName.lastIndexOf("["));
-                String prefixName = "一人之下.S02E";
-                String suffixName = newName.substring(newName.lastIndexOf("话 "));
-                newName = "一人之下.S02E" + getEpisodeIndex(newName, prefixName, "话", 2) + suffixName + ".flv";
-                newName = newName.replace("话 ", ".");
+                String newName = originName;
+                newName = newName.replace("哆啦A梦.S01", "哆啦A梦.");
+//                int ep = (Integer.valueOf(newName.substring(0, 2)) - 74);
+//                newName = newName.substring(newName.indexOf("话 ")+2);
+//                newName = "狐妖小红娘.南国篇.E" + (ep<10 ? "0" + ep : ep) + "." +newName;
+//                newName = newName.replace(" 1080P","");
                 if (rename) {
                     file.renameTo(new File(file.getParent() + "\\" + newName));
                 }
@@ -105,13 +105,13 @@ public class FileBox {
     }
 
     private static void createBatchRenameTask(int index) {
-        String dirPath = "\\\\DS218plus\\theater-part3\\4-Cartoon(动漫)\\1 - 动漫剧集\\《马丁的早晨》" + (index == 0 ? "" : index);
+        String dirPath = "\\\\DS218plus\\0-Cinema2\\4-Cartoon(动漫)\\1 - 动漫剧集\\《龙珠系列_5》龙珠改：布欧篇" + (index == 0 ? "" : index);
 
 //        changeSuffix(dirPath);
 
-        String matchPrefix = "马丁的早晨.Martin.Morning.E";
-        String matchSuffix = ".2003.DVD.2Audio.MiniSD-TLF";
-        String newPrefix = "Martin.Morning.E";
+        String matchPrefix = "[Skytree][龙珠改_布欧篇][Dragon_Ball_Kai][";
+        String matchSuffix = "][GB_JP";
+        String newPrefix = "龙珠改：布欧篇.E";
         String newSuffix = "";
 
         batchRename(dirPath, matchPrefix, matchSuffix, newPrefix, newSuffix, rename);
@@ -168,7 +168,7 @@ public class FileBox {
                 System.out.println(String.format("NewName=%s  <--  OldName=%s", newName, originName));
                 count++;
             } catch (Exception e) {
-                e.printStackTrace();
+//                e.printStackTrace();
                 System.out.println(String.format("skip the file: %s, because %s", originName, e.getMessage()));
             }
         }
@@ -181,7 +181,7 @@ public class FileBox {
             if (prefix.isEmpty()) {
                 indexStr = name.substring(0, name.substring(prefix.length()).indexOf(suffix));
             } else {
-                indexStr = name.substring(prefix.length()).substring(0, name.substring(prefix.length()).indexOf(suffix));
+                indexStr = name.substring(name.indexOf(prefix) + prefix.length(), name.indexOf(suffix));
             }
         } else {
             if (!prefix.isEmpty() && name.contains(prefix)) {

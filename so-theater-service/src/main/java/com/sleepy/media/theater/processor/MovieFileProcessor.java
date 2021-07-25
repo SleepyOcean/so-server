@@ -330,6 +330,12 @@ public class MovieFileProcessor {
         }
     }
 
+    /**
+     * 将电影的原始名称写入当前目录的original_meta.json文件中
+     *
+     * @param targetDir
+     * @param confirmRename
+     */
     public void writeMetaJsonFile(File targetDir, boolean confirmRename) {
         Map<String, String> originalMeta = new HashMap<>(128);
         try {
@@ -340,5 +346,28 @@ public class MovieFileProcessor {
         if (confirmRename) {
             FileTools.writeString(targetDir.getAbsolutePath() + File.separator + "original_meta.json", JSON.toJSONString(originalMeta));
         }
+    }
+
+    public void regularPage18Video(String sourceDir, String toDir) {
+        File dirFile = new File(sourceDir);
+        List<File> videoFiles = new ArrayList<>();
+        for (File file : dirFile.listFiles()) {
+            File[] files = file.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    File file = new File(dir, name);
+                    return file.isFile() && videoFormat.contains(getFileType(file.getName()));
+                }
+            });
+            videoFiles.addAll(Arrays.asList(files));
+        }
+
+        videoFiles.forEach(file -> {
+            try {
+                FileTools.moveFileToDir(file.getAbsolutePath(), toDir);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 }
