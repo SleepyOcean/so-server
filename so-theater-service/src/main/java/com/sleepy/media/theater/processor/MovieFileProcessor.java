@@ -341,4 +341,9 @@ public class MovieFileProcessor {
             FileTools.writeString(targetDir.getAbsolutePath() + File.separator + "original_meta.json", JSON.toJSONString(originalMeta));
         }
     }
+
+    public void renameMovieDirForTmmSearch(File movieDir) {
+        String newName = movieDir.getName().substring(movieDir.getName().indexOf("(") + 1, movieDir.getName().indexOf(")"));
+        renameFile(movieDir, newName);
+    }
 }
