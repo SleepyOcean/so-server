@@ -22,6 +22,20 @@ public class MovieFetchTest {
     static String DS_218_PATH = "G:\\MovieFetchLab\\0-WorkDir\\Target";
 
     @Test
+    public void moveTop3() {
+        String sourceDir = "\\\\DS218plus\\0-Cinema3\\5-Classify(小小篇)\\Collection - page18.area\\2-fresh\\2";
+        String toDir = sourceDir + File.separator + "regular";
+        movieFileProcessor.regularPage18Video(sourceDir, toDir);
+    }
+
+    @Test
+    public void moveFileTest() throws IOException {
+        String sourceDir = "\\\\DS218plus\\0-Cinema3\\5-Classify(小小篇)\\Collection - page18.area\\2-fresh\\2";
+        String toDir = "\\\\DS218plus\\0-Cinema3\\5-Classify(小小篇)\\Collection - page18.area\\2-fresh\\2";
+        movieFileProcessor.regularPage18Video(sourceDir, toDir);
+    }
+
+    @Test
     public void writeOriginalMetaJsonFile() throws IOException {
         movieFileProcessor.writeMetaJsonFile(new File("\\\\DS218plus\\0-Cinema1\\2-院线上新\\The.Tomorrow.War.2021.HDR.2160p.WEB.H265-NAISU"), false);
 //        movieFileProcessor.writeMetaJsonFile(new File("\\\\DS218plus\\0-Cinema1\\2-院线上新\\War.For.The.Planet.Of.The.Apes.2017.2160p.UHD.BluRay.x265-EMERALD"));
@@ -76,8 +90,8 @@ public class MovieFetchTest {
     @Test
     public void createFakeFile() throws IOException {
         FakeFileProcessor processor = new FakeFileProcessor();
-        List<FakeFilePOJO> tree = processor.readFileTree("G:\\2-实验目录\\MovieLab\\0 - 源文件");
-        processor.writeFakeFile(tree, "G:\\2-实验目录\\MovieLab\\target");
+        List<FakeFilePOJO> tree = processor.readFileTree("\\\\DS218plus\\0-Cinema3\\5-Classify(小小篇)\\Collection - page18.area\\2-fresh");
+        processor.writeFakeFile(tree, "G:\\2-实验目录\\MovieLab\\fresh");
     }
 
     @Test

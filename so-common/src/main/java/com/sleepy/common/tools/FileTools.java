@@ -10,6 +10,9 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -144,9 +147,50 @@ public class FileTools {
         Files.copy(sourceFile.toPath(), targetFile.toPath());
     }
 
+    /**
+     * 拷贝文件到指定目录的文件
+     * 源文件 -> 目标目录
+     *
+     * @param sourceFile
+     * @param targetDir
+     * @throws IOException
+     */
     public static void copyFileToDir(File sourceFile, File targetDir) throws IOException {
         File target = new File(targetDir.getAbsolutePath() + File.separator + sourceFile.getName());
         copyFileToFile(sourceFile, target);
+    }
+
+    /**
+     * 移动文件到指定目录
+     * 源文件路径 -> 目标目录路径
+     *
+     * @param from
+     * @param to
+     * @throws IOException
+     */
+    public static void moveFileToDir(String from, String to) throws IOException {
+        //文件
+        Path fromFile = Paths.get(from);
+        //目标文件夹
+        Path anotherDir = Paths.get(to);
+
+        Files.createDirectories(anotherDir);
+
+        Files.move(fromFile, anotherDir.resolve(fromFile.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    /**
+     * 文件重命名
+     *
+     * @param file 目标文件
+     * @param name 新名
+     */
+    public static void renameFile(File file, String name) {
+        String newFileName = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(File.separator)) + File.separator + name;
+        File newFile = new File(newFileName);
+        if (file.exists()) {
+            file.renameTo(newFile);
+        }
     }
 
     /**
