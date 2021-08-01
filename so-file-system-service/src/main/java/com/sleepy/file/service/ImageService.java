@@ -69,6 +69,9 @@ public interface ImageService {
      * 备份图片数据
      *
      * @return
+     * @throws IOException
      */
     String backup() throws IOException;
+
+    String recover() throws IOException;
 }

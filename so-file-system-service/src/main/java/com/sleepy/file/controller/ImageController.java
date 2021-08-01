@@ -80,4 +80,9 @@ public class ImageController {
     public String backup() throws IOException {
         return imageService.backup();
     }
+
+    @PostMapping("/recover")
+    public String recover() throws IOException {
+        return imageService.recover();
+    }
 }

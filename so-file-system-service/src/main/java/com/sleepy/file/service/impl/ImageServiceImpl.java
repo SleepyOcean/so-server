@@ -1,12 +1,15 @@
 package com.sleepy.file.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.sleepy.common.constant.HttpStatus;
 import com.sleepy.common.tools.*;
+import com.sleepy.file.FileApplication;
 import com.sleepy.file.common.Constant;
 import com.sleepy.file.dao.ImageDAO;
 import com.sleepy.file.dto.ImageDTO;
+import com.sleepy.file.img.so.so_gallery.SoGalleryManager;
 import com.sleepy.file.service.ImageService;
 import com.sleepy.file.vo.ImageVO;
 import com.sleepy.file.vo.ImgSearchVO;
@@ -22,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -34,11 +38,14 @@ public class ImageServiceImpl implements ImageService {
 
     @Autowired
     ImageDAO imageDAO;
+    @Autowired
+    FileApplication app;
 
     @Value("${imgDir}")
     private String imgDir;
 
     private String backupDir = "G:\\2-实验目录\\3-CodeTest\\ImageServBackup";
+    private static final String IMG_DATABASE_JSON_NAME = "image-database.json";
 
     @Override
     public byte[] getImg(HttpServletResponse response, String id) throws IOException {
@@ -185,6 +192,27 @@ public class ImageServiceImpl implements ImageService {
         // todo: step5. transfer backup zip file to NAS
 
         return null;
+    }
+
+    @Override
+    public String recover() throws IOException {
+        String backupPath = "G:\\2-实验目录\\3-CodeTest\\ImageServBackup";
+        SoGalleryManager gallery = app.getOrThrow(SoGalleryManager.class);
+        String imgDataJsonStr = FileTools.readToString(backupPath + File.separator + IMG_DATABASE_JSON_NAME);
+        JSONArray imgDataJsonArray = JSON.parseArray(imgDataJsonStr);
+        for (Object o : imgDataJsonArray) {
+            ImageDTO img = JSON.parseObject(o.toString(), ImageDTO.class);
+            gallery.merge(gallery.create()
+                    .setId(img.getImageId())
+                    .setTitle(StringTools.getOrDefault(img.getAlias(), img.getCreateTime()))
+                    .setFormat(img.getImgFormat())
+                    .setSize(img.getImgSize())
+                    .setResolution(img.getResolutionRatio())
+                    .setPath(img.getPath())
+                    .setCreateTime(new Timestamp(DateTools.toDate(img.getCreateTime(), DateTools.DEFAULT_DATETIME_PATTERN).getTime()))
+                    .setUpdateTime(new Timestamp(DateTools.toDate(img.getUploadTime(), DateTools.DEFAULT_DATETIME_PATTERN).getTime())));
+        }
+        return "success";
     }
 
     /**
