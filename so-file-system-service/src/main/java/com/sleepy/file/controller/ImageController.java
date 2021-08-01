@@ -75,4 +75,9 @@ public class ImageController {
             return "editCode 错误!操作失败";
         }
     }
+
+    @PostMapping("/backup")
+    public String backup() throws IOException {
+        return imageService.backup();
+    }
 }

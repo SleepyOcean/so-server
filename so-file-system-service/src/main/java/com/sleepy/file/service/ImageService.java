@@ -64,4 +64,11 @@ public interface ImageService {
      * @return
      */
     String delete(ImageVO vo) throws IOException;
+
+    /**
+     * 备份图片数据
+     *
+     * @return
+     */
+    String backup() throws IOException;
 }

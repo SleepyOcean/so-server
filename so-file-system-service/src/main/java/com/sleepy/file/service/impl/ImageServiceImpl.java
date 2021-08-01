@@ -38,6 +38,8 @@ public class ImageServiceImpl implements ImageService {
     @Value("${imgDir}")
     private String imgDir;
 
+    private String backupDir = "G:\\2-实验目录\\3-CodeTest\\ImageServBackup";
+
     @Override
     public byte[] getImg(HttpServletResponse response, String id) throws IOException {
         String imgPath;
@@ -162,6 +164,46 @@ public class ImageServiceImpl implements ImageService {
         return "success";
     }
 
+    @Override
+    public String backup() throws IOException {
+        // todo: step1. choose full backup or delta backup
+        boolean fullBackup = true;
+
+        // todo: step2. query database to get the backup item list
+        String start = "2018-01-01 00:00:00";
+        String end = DateTools.currentTimeStr();
+        List<ImageDTO> list = imageDAO.getByRangeTime(start, end);
+
+        // todo: step3. move data to backup folder according to backup item list
+        for (ImageDTO imageDTO : list) {
+            String imagePath = getImagePath(imageDTO.getImageId());
+            FileTools.copyFileToDir(new File(imagePath), getBackupDir());
+        }
+
+        // todo: step4. compress backup folder
+
+        // todo: step5. transfer backup zip file to NAS
+
+        return null;
+    }
+
+    /**
+     * 获取数据备份路径File
+     *
+     * @return
+     */
+    private File getBackupDir() {
+        File file = new File(backupDir);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        return file;
+    }
+
+    private String getImagePath(String imageId) {
+        return imgDir + imageId;
+    }
+
     private void deleteSingleImg(String imgId) throws IOException {
         String imgPath = imgDir + imageDAO.findLocalPathById(imgId);
         imageDAO.deleteByIds(Arrays.asList(imgId));
@@ -182,5 +224,6 @@ public class ImageServiceImpl implements ImageService {
             }
         });
     }
+
 
 }

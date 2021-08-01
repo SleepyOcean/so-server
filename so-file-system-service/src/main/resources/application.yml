@@ -18,3 +18,5 @@ logging:
   level:
     root: error
     com.sleepy: info
+
+esuris: http://es.sleepyocean.cn
