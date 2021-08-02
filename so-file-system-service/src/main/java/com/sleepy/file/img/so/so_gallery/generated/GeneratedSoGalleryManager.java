@@ -30,11 +30,11 @@ public interface GeneratedSoGalleryManager extends Manager<SoGallery> {
             SoGallery.FORMAT,
             SoGallery.PATH,
             SoGallery.RESOLUTION,
-            SoGallery.DESCRIPTION,
             SoGallery.TITLE,
+            SoGallery.DESCRIPTION,
             SoGallery.TAG,
             SoGallery.CREATE_TIME,
-            SoGallery.UPDATE_TIME
+            SoGallery.UPLOAD_TIME
     ));
 
     @Override

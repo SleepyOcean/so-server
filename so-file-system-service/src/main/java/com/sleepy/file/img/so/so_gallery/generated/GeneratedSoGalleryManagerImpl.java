@@ -48,7 +48,7 @@ public abstract class GeneratedSoGalleryManagerImpl
     @Override
     public Stream<Field<SoGallery>> primaryKeyFields() {
         return Stream.of(
-                SoGallery.ID
+            SoGallery.ID
         );
     }
 }

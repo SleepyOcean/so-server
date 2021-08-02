@@ -31,3 +31,4 @@ build/
 
 ### Speedment ###
 .speedment
+speedment.json

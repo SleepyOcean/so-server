@@ -447,11 +447,28 @@ public class GeneratedFileMetadata extends AbstractApplicationMetadata {
                 "              {",
                 "                \"columns\" : [",
                 "                  {",
+                "                    \"autoIncrement\" : false,",
+                "                    \"databaseType\" : \"java.sql.Timestamp\",",
+                "                    \"enabled\" : false,",
+                "                    \"expanded\" : false,",
+                "                    \"id\" : \"update_time\",",
+                "                    \"name\" : \"update_time\",",
+                "                    \"nameProtected\" : true,",
+                "                    \"nullable\" : true,",
+                "                    \"nullableImplementation\" : \"OPTIONAL\",",
+                "                    \"ordinalPosition\" : 10",
+                "                  },",
+                "                  {",
                 "                    \"databaseType\" : \"java.lang.String\",",
                 "                    \"enabled\" : true,",
                 "                    \"expanded\" : false,",
                 "                    \"id\" : \"id\",",
-                "                    \"name\" : \"id\",",
+                "                    \"name\" : \"id\","
+        ).forEachOrdered(sb::append);
+    }
+
+    private static void initPart4(StringBuilder sb) {
+        Stream.of(
                 "                    \"nullable\" : false,",
                 "                    \"ordinalPosition\" : 1",
                 "                  },",
@@ -463,12 +480,7 @@ public class GeneratedFileMetadata extends AbstractApplicationMetadata {
                 "                    \"name\" : \"size\",",
                 "                    \"nullable\" : false,",
                 "                    \"ordinalPosition\" : 2",
-                "                  },"
-        ).forEachOrdered(sb::append);
-    }
-
-    private static void initPart4(StringBuilder sb) {
-        Stream.of(
+                "                  },",
                 "                  {",
                 "                    \"databaseType\" : \"java.lang.String\",",
                 "                    \"enabled\" : true,",
@@ -500,51 +512,55 @@ public class GeneratedFileMetadata extends AbstractApplicationMetadata {
                 "                    \"databaseType\" : \"java.lang.String\",",
                 "                    \"enabled\" : true,",
                 "                    \"expanded\" : false,",
-                "                    \"id\" : \"description\",",
-                "                    \"name\" : \"description\",",
-                "                    \"nullable\" : true,",
+                "                    \"id\" : \"title\",",
+                "                    \"name\" : \"title\",",
+                "                    \"nullable\" : false,",
                 "                    \"ordinalPosition\" : 6",
                 "                  },",
                 "                  {",
                 "                    \"databaseType\" : \"java.lang.String\",",
                 "                    \"enabled\" : true,",
                 "                    \"expanded\" : false,",
-                "                    \"id\" : \"title\",",
-                "                    \"name\" : \"title\",",
-                "                    \"nullable\" : false,",
+                "                    \"id\" : \"description\",",
+                "                    \"name\" : \"description\",",
+                "                    \"nullable\" : true,",
                 "                    \"ordinalPosition\" : 7",
                 "                  },",
                 "                  {",
                 "                    \"databaseType\" : \"java.lang.String\",",
+                "                    \"enabled\" : true,",
                 "                    \"expanded\" : false,",
                 "                    \"id\" : \"tag\",",
                 "                    \"name\" : \"tag\",",
-                "                    \"nullable\" : false,",
+                "                    \"nullable\" : true,",
                 "                    \"ordinalPosition\" : 8",
                 "                  },",
                 "                  {",
                 "                    \"databaseType\" : \"java.sql.Timestamp\",",
+                "                    \"enabled\" : true,",
                 "                    \"expanded\" : false,",
                 "                    \"id\" : \"create_time\",",
                 "                    \"name\" : \"create_time\",",
-                "                    \"nullable\" : true,",
+                "                    \"nullable\" : false,",
                 "                    \"ordinalPosition\" : 9",
                 "                  },",
                 "                  {",
                 "                    \"databaseType\" : \"java.sql.Timestamp\",",
-                "                    \"expanded\" : false,",
-                "                    \"id\" : \"update_time\",",
-                "                    \"name\" : \"update_time\",",
-                "                    \"nullable\" : true,",
+                "                    \"enabled\" : true,",
+                "                    \"expanded\" : true,",
+                "                    \"id\" : \"upload_time\",",
+                "                    \"name\" : \"upload_time\",",
+                "                    \"nullable\" : false,",
                 "                    \"ordinalPosition\" : 10",
                 "                  }",
                 "                ],",
                 "                \"enabled\" : true,",
-                "                \"expanded\" : false,",
+                "                \"expanded\" : true,",
                 "                \"id\" : \"so_gallery\",",
                 "                \"implements\" : \"\",",
                 "                \"indexes\" : [",
                 "                  {",
+                "                    \"enabled\" : true,",
                 "                    \"expanded\" : false,",
                 "                    \"id\" : \"PRIMARY\",",
                 "                    \"indexColumns\" : [",
@@ -553,7 +569,12 @@ public class GeneratedFileMetadata extends AbstractApplicationMetadata {
                 "                        \"id\" : \"id\",",
                 "                        \"name\" : \"id\",",
                 "                        \"orderType\" : \"ASC\",",
-                "                        \"ordinalPosition\" : 1",
+                "                        \"ordinalPosition\" : 1"
+        ).forEachOrdered(sb::append);
+    }
+
+    private static void initPart5(StringBuilder sb) {
+        Stream.of(
                 "                      }",
                 "                    ],",
                 "                    \"name\" : \"PRIMARY\",",
@@ -565,16 +586,12 @@ public class GeneratedFileMetadata extends AbstractApplicationMetadata {
                 "                \"nameProtected\" : true,",
                 "                \"primaryKeyColumns\" : [",
                 "                  {",
+                "                    \"enabled\" : true,",
                 "                    \"expanded\" : false,",
                 "                    \"id\" : \"id\",",
                 "                    \"name\" : \"id\",",
                 "                    \"ordinalPosition\" : 1",
-                "                  }"
-        ).forEachOrdered(sb::append);
-    }
-
-    private static void initPart5(StringBuilder sb) {
-        Stream.of(
+                "                  }",
                 "                ]",
                 "              },",
                 "              {",
@@ -658,7 +675,12 @@ public class GeneratedFileMetadata extends AbstractApplicationMetadata {
                 "                    \"nullable\" : true,",
                 "                    \"ordinalPosition\" : 3",
                 "                  },",
-                "                  {",
+                "                  {"
+        ).forEachOrdered(sb::append);
+    }
+
+    private static void initPart6(StringBuilder sb) {
+        Stream.of(
                 "                    \"databaseType\" : \"java.lang.String\",",
                 "                    \"expanded\" : false,",
                 "                    \"id\" : \"local_video_path\",",
@@ -675,12 +697,7 @@ public class GeneratedFileMetadata extends AbstractApplicationMetadata {
                 "                    \"ordinalPosition\" : 5",
                 "                  },",
                 "                  {",
-                "                    \"databaseType\" : \"java.lang.String\","
-        ).forEachOrdered(sb::append);
-    }
-
-    private static void initPart6(StringBuilder sb) {
-        Stream.of(
+                "                    \"databaseType\" : \"java.lang.String\",",
                 "                    \"expanded\" : false,",
                 "                    \"id\" : \"namecn\",",
                 "                    \"name\" : \"namecn\",",
@@ -764,7 +781,12 @@ public class GeneratedFileMetadata extends AbstractApplicationMetadata {
                 "              {",
                 "                \"columns\" : [",
                 "                  {",
-                "                    \"databaseType\" : \"java.lang.Long\",",
+                "                    \"databaseType\" : \"java.lang.Long\","
+        ).forEachOrdered(sb::append);
+    }
+
+    private static void initPart7(StringBuilder sb) {
+        Stream.of(
                 "                    \"expanded\" : false,",
                 "                    \"id\" : \"id\",",
                 "                    \"name\" : \"id\",",
@@ -781,12 +803,7 @@ public class GeneratedFileMetadata extends AbstractApplicationMetadata {
                 "                    \"ordinalPosition\" : 2",
                 "                  },",
                 "                  {",
-                "                    \"databaseType\" : \"java.lang.String\","
-        ).forEachOrdered(sb::append);
-    }
-
-    private static void initPart7(StringBuilder sb) {
-        Stream.of(
+                "                    \"databaseType\" : \"java.lang.String\",",
                 "                    \"expanded\" : false,",
                 "                    \"id\" : \"name_abbr\",",
                 "                    \"name\" : \"name_abbr\",",
@@ -870,7 +887,12 @@ public class GeneratedFileMetadata extends AbstractApplicationMetadata {
                 "                        \"id\" : \"id\",",
                 "                        \"name\" : \"id\",",
                 "                        \"orderType\" : \"ASC\",",
-                "                        \"ordinalPosition\" : 1",
+                "                        \"ordinalPosition\" : 1"
+        ).forEachOrdered(sb::append);
+    }
+
+    private static void initPart8(StringBuilder sb) {
+        Stream.of(
                 "                      }",
                 "                    ],",
                 "                    \"name\" : \"PRIMARY\",",
@@ -887,12 +909,7 @@ public class GeneratedFileMetadata extends AbstractApplicationMetadata {
                 "                    \"name\" : \"id\",",
                 "                    \"ordinalPosition\" : 1",
                 "                  }",
-                "                ]"
-        ).forEachOrdered(sb::append);
-    }
-
-    private static void initPart8(StringBuilder sb) {
-        Stream.of(
+                "                ]",
                 "              },",
                 "              {",
                 "                \"columns\" : [",
@@ -976,7 +993,12 @@ public class GeneratedFileMetadata extends AbstractApplicationMetadata {
                 "                    \"id\" : \"score\",",
                 "                    \"name\" : \"score\",",
                 "                    \"nullable\" : true,",
-                "                    \"ordinalPosition\" : 10",
+                "                    \"ordinalPosition\" : 10"
+        ).forEachOrdered(sb::append);
+    }
+
+    private static void initPart9(StringBuilder sb) {
+        Stream.of(
                 "                  },",
                 "                  {",
                 "                    \"databaseType\" : \"java.lang.String\",",
@@ -993,12 +1015,7 @@ public class GeneratedFileMetadata extends AbstractApplicationMetadata {
                 "                    \"name\" : \"alias\",",
                 "                    \"nullable\" : true,",
                 "                    \"ordinalPosition\" : 12",
-                "                  },"
-        ).forEachOrdered(sb::append);
-    }
-
-    private static void initPart9(StringBuilder sb) {
-        Stream.of(
+                "                  },",
                 "                  {",
                 "                    \"databaseType\" : \"java.lang.String\",",
                 "                    \"expanded\" : false,",
@@ -1082,7 +1099,12 @@ public class GeneratedFileMetadata extends AbstractApplicationMetadata {
                 "                  {",
                 "                    \"databaseType\" : \"java.lang.String\",",
                 "                    \"expanded\" : false,",
-                "                    \"id\" : \"capture_urls\",",
+                "                    \"id\" : \"capture_urls\","
+        ).forEachOrdered(sb::append);
+    }
+
+    private static void initPart10(StringBuilder sb) {
+        Stream.of(
                 "                    \"name\" : \"capture_urls\",",
                 "                    \"nullable\" : true,",
                 "                    \"ordinalPosition\" : 23",
@@ -1099,12 +1121,7 @@ public class GeneratedFileMetadata extends AbstractApplicationMetadata {
                 "                    \"databaseType\" : \"java.lang.String\",",
                 "                    \"expanded\" : false,",
                 "                    \"id\" : \"update_time\",",
-                "                    \"name\" : \"update_time\","
-        ).forEachOrdered(sb::append);
-    }
-
-    private static void initPart10(StringBuilder sb) {
-        Stream.of(
+                "                    \"name\" : \"update_time\",",
                 "                    \"nullable\" : false,",
                 "                    \"ordinalPosition\" : 25",
                 "                  },",
@@ -1188,7 +1205,12 @@ public class GeneratedFileMetadata extends AbstractApplicationMetadata {
                 "                  {",
                 "                    \"databaseType\" : \"java.lang.String\",",
                 "                    \"expanded\" : false,",
-                "                    \"id\" : \"name\",",
+                "                    \"id\" : \"name\","
+        ).forEachOrdered(sb::append);
+    }
+
+    private static void initPart11(StringBuilder sb) {
+        Stream.of(
                 "                    \"name\" : \"name\",",
                 "                    \"nullable\" : true,",
                 "                    \"ordinalPosition\" : 3",
@@ -1205,12 +1227,7 @@ public class GeneratedFileMetadata extends AbstractApplicationMetadata {
                 "                    \"databaseType\" : \"java.lang.String\",",
                 "                    \"expanded\" : false,",
                 "                    \"id\" : \"phone\",",
-                "                    \"name\" : \"phone\","
-        ).forEachOrdered(sb::append);
-    }
-
-    private static void initPart11(StringBuilder sb) {
-        Stream.of(
+                "                    \"name\" : \"phone\",",
                 "                    \"nullable\" : true,",
                 "                    \"ordinalPosition\" : 5",
                 "                  },",

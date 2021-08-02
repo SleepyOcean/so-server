@@ -4,12 +4,8 @@ server:
     uri-encoding: UTF-8
     max-threads: 100
 spring:
-  elasticsearch:
-    jest:
-      connection-timeout: 30000
-      multi-threaded: true
-      uris: http://es.sleepyocean.cn
-      read-timeout: 7200
+  jackson:
+    default-property-inclusion: non_null
   servlet:
     multipart:
       max-file-size: 10485760
@@ -18,5 +14,3 @@ logging:
   level:
     root: error
     com.sleepy: info
-
-esuris: http://es.sleepyocean.cn

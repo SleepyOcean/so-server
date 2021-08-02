@@ -35,11 +35,11 @@ public abstract class GeneratedSoGallerySqlAdapter implements SqlAdapter<SoGalle
                 .setFormat(resultSet.getString(3 + offset))
                 .setPath(resultSet.getString(4 + offset))
                 .setResolution(resultSet.getString(5 + offset))
-                .setDescription(resultSet.getString(6 + offset))
-                .setTitle(resultSet.getString(7 + offset))
+                .setTitle(resultSet.getString(6 + offset))
+                .setDescription(resultSet.getString(7 + offset))
                 .setTag(resultSet.getString(8 + offset))
                 .setCreateTime(resultSet.getTimestamp(9 + offset))
-                .setUpdateTime(resultSet.getTimestamp(10 + offset))
+                .setUploadTime(resultSet.getTimestamp(10 + offset))
                 ;
     }
 

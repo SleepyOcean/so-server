@@ -2,13 +2,13 @@ package com.sleepy.file.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.sleepy.common.constant.HttpStatus;
+import com.sleepy.common.http.CommonDTO;
+import com.sleepy.common.model.MapModel;
 import com.sleepy.common.tools.*;
-import com.sleepy.file.FileApplication;
 import com.sleepy.file.common.Constant;
-import com.sleepy.file.dao.ImageDAO;
 import com.sleepy.file.dto.ImageDTO;
+import com.sleepy.file.img.so.so_gallery.SoGallery;
 import com.sleepy.file.img.so.so_gallery.SoGalleryManager;
 import com.sleepy.file.service.ImageService;
 import com.sleepy.file.vo.ImageVO;
@@ -27,6 +27,14 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.sleepy.common.request.Check.checkStr;
+import static com.sleepy.common.tools.DateTools.DEFAULT_DATETIME_PATTERN;
+import static com.sleepy.common.tools.DateTools.convertToTimestamp;
+import static com.sleepy.common.tools.FileTools.constructPath;
+import static com.sleepy.common.tools.StringTools.getOrDefault;
+import static com.sleepy.file.common.Constant.IMG_STORAGE_NAME;
 
 /**
  * @author SleepyOcean
@@ -36,30 +44,16 @@ import java.util.*;
 @Slf4j
 public class ImageServiceImpl implements ImageService {
 
+    @Value("${storage}")
+    private String STORAGE_ROOT;
     @Autowired
-    ImageDAO imageDAO;
-    @Autowired
-    FileApplication app;
-
-    @Value("${imgDir}")
-    private String imgDir;
-
-    private String backupDir = "G:\\2-实验目录\\3-CodeTest\\ImageServBackup";
-    private static final String IMG_DATABASE_JSON_NAME = "image-database.json";
+    SoGalleryManager gallery;
 
     @Override
     public byte[] getImg(HttpServletResponse response, String id) throws IOException {
-        String imgPath;
-        if (id.contains(StringTools.POINT)) {
-            imgPath = imgDir + "resource" + File.separator + id;
-        } else {
-            String imgName = imageDAO.findLocalPathById(id);
-            if (StringTools.isNotNullOrEmpty(imgName)) {
-                imgPath = imgDir + imgName;
-            } else {
-                return new byte[0];
-            }
-        }
+        String imgPath = getLocalImagePath(id);
+        checkStr(imgPath);
+
         File file = new File(imgPath);
         if (!file.exists()) {
             return new byte[0];
@@ -73,6 +67,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public byte[] getImgThumbnail(HttpServletResponse response, String id) {
+        // todo 获取图片缩略图
         return new byte[0];
     }
 
@@ -105,152 +100,152 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public Map<String, Object> search(ImgSearchVO vo) throws IOException {
-        return imageDAO.search(vo);
+    public CommonDTO search(ImgSearchVO vo) throws IOException {
+        long total = gallery.stream().count();
+        List<SoGallery> data = gallery.stream().sorted(Comparator.comparing(SoGallery::getUploadTime).reversed()).skip(vo.getPageStart() * vo.getPageSize()).limit(vo.getPageSize()).collect(Collectors.toList());
+        return CommonDTO.create(HttpStatus.OK, "search is done.").setResultList(data).setTotal(total);
     }
 
     @Override
-    public String upload(ImageVO vo) throws IOException {
-        String imageId;
+    public CommonDTO upload(ImageVO vo) throws IOException {
         String md5 = FileTools.getStringMD5(vo.getImgOfBase64());
-        imageId = md5;
-        Map<String, Object> result = new HashMap<>(4);
-        if (StringTools.isNullOrEmpty(imageDAO.findLocalPathById(md5))) {
-            ImageDTO entity = JSON.parseObject(JSON.toJSONString(vo), ImageDTO.class);
-            String currentDay = DateTools.dateFormat(new Date(), DateTools.DEFAULT_DATE_PATTERN);
-            String currentTime = DateTools.dateFormat(new Date());
-            if (StringTools.isNullOrEmpty(entity.getType())) {
-                entity.setType(Constant.IMG_TYPE_GALLERY);
-            }
-            // 图片名称的路径： 图片的类型/图片上传日期/图片的UUID， 例如： 封面/2019-10-31/2fc9e266e21f4fe18f92da2fc56567f8
-            String randomName = entity.getType() + File.separator + currentDay + File.separator + StringTools.getRandomUuid("");
-            String imgPath = ImageTools.base64ToImgFile(vo.getImgOfBase64(), imgDir + randomName);
-
-            try {
-                FileTools.ImgMetaHolder imgMetaHolder = new FileTools.ImgMetaHolder(imgPath);
-                Map imgMeta = imgMetaHolder.getMetaInfo();
-                if (StringTools.isNotNullOrEmpty(vo.getAlias())) {
-                    entity.setAlias(vo.getAlias());
-                }
-                if (StringTools.isNotNullOrEmpty(vo.getDescribeInfo())) {
-                    entity.setDescribeInfo(vo.getDescribeInfo());
-                }
-                entity.setUploadTime(currentTime);
-                entity.setPath(imgPath.substring(imgDir.length()));
-                entity.setCreateTime(imgMeta.get("创建时间") != null ? imgMeta.get("创建时间").toString() : currentTime);
-                entity.setImgSize(imgMeta.get("图片大小").toString());
-                entity.setImgFormat(imgMeta.get("图片格式").toString());
-                entity.setResolutionRatio(imgMeta.get("宽") + " × " + imgMeta.get("高"));
-                entity.setImageId(imageId);
-                imageDAO.save(entity);
-                result.put("status", HttpStatus.OK);
-            } catch (Exception e) {
-                File file = new File(imgPath);
-                file.delete();
-                result.put("status", HttpStatus.INTERNAL_ERROR);
-                result.put("message", e.getMessage());
-                return new JSONObject(result).toJSONString();
-            }
-        } else {
-            result.put("status", HttpStatus.NOT_ACCEPTABLE);
+        // 判断文件是否已经存在，若存在则直接返回结果
+        if (gallery.stream().filter(SoGallery.ID.equal(md5)).collect(Collectors.toList()).size() > 0) {
+            return CommonDTO.create(HttpStatus.CONFLICT, "The image already existed")
+                    .setResult(CommonTools.getCustomMap(
+                            new MapModel("imageId", md5),
+                            new MapModel("url", Constant.IMG_SERVER_URL_PLACEHOLDER + md5),
+                            new MapModel("imgUrl", Constant.IMG_SERVER_URL_PREFIX + md5)));
         }
-        result.put("id", imageId);
-        result.put("url", Constant.IMG_SERVER_URL_PLACEHOLDER + imageId);
-        result.put("imgUrl", Constant.IMG_SERVER_URL_PREFIX + imageId);
-        return new JSONObject(result).toJSONString();
+
+        String currentDay = DateTools.dateFormat(new Date(), DateTools.DEFAULT_DATE_PATTERN);
+        String currentTime = DateTools.dateFormat(new Date());
+        // 图片名称的路径： 图片的类型/图片上传日期/图片的UUID， 例如： 封面/2019-10-31/2fc9e266e21f4fe18f92da2fc56567f8
+        String relativePath = constructPath("Gallery", currentDay, StringTools.getRandomUuid(""));
+        String absolutePath = ImageTools.base64ToImgFile(vo.getImgOfBase64(), constructPath(STORAGE_ROOT, IMG_STORAGE_NAME, relativePath));
+
+        try {
+            FileTools.ImgMetaHolder imgMetaHolder = new FileTools.ImgMetaHolder(absolutePath);
+            Map imgMeta = imgMetaHolder.getMetaInfo();
+            SoGallery entity = gallery.create()
+                    .setId(md5)
+                    .setTitle(vo.getAlias())
+                    .setDescription(getOrDefault(vo.getDescribeInfo(), ""))
+                    .setSize(imgMeta.get("图片大小").toString())
+                    .setFormat(imgMeta.get("图片格式").toString())
+                    .setResolution(imgMeta.get("宽") + " × " + imgMeta.get("高"))
+                    .setPath(absolutePath.substring(constructPath(STORAGE_ROOT, IMG_STORAGE_NAME).length()))
+                    .setCreateTime(convertToTimestamp(getOrDefault(imgMeta.get("创建时间").toString(), currentTime)))
+                    .setUploadTime(new Timestamp(System.currentTimeMillis()));
+            gallery.persist(entity);
+        } catch (Exception e) {
+            File file = new File(absolutePath);
+            file.delete();
+            return CommonDTO.create(HttpStatus.INTERNAL_ERROR, e.getMessage());
+        }
+
+        return CommonDTO.create(HttpStatus.OK, "The image is uploaded successfully.")
+                .setResult(CommonTools.getCustomMap(
+                        new MapModel("imageId", md5),
+                        new MapModel("url", Constant.IMG_SERVER_URL_PLACEHOLDER + md5),
+                        new MapModel("imgUrl", Constant.IMG_SERVER_URL_PREFIX + md5)));
     }
 
     @Override
-    public String delete(ImageVO vo) throws IOException {
+    public CommonDTO delete(ImageVO vo) throws IOException {
         if (!StringTools.isNullOrEmpty(vo.getImageId())) {
-            deleteSingleImg(vo.getImageId());
+            deleteImage(vo.getImageId());
+            return CommonDTO.create(HttpStatus.OK, String.format("Delete successfully: %s", vo.getImageId()));
+        } else if (vo.getImgIds() != null && vo.getImgIds().size() > 0) {
+            deleteImages(vo.getImgIds());
+            return CommonDTO.create(HttpStatus.OK, String.format("Delete successfully: %s", vo.getImgIds()));
         }
-        if (vo.getImgIds() != null && vo.getImgIds().size() > 0) {
-            batchDeleteImg(vo.getImgIds());
-        }
-        return "success";
+        return CommonDTO.create(HttpStatus.NOT_MODIFIED, String.format("ImageId(s) not provide, do nothing."));
     }
 
     @Override
-    public String backup() throws IOException {
-        // todo: step1. choose full backup or delta backup
-        boolean fullBackup = true;
+    public CommonDTO backup(ImageVO vo) throws IOException {
+        // todo: step1. get backup data time range
+        Date start = DateTools.toDate(vo.getStartTime(), DEFAULT_DATETIME_PATTERN);
+        Date end = DateTools.toDate(vo.getEndTime(), DEFAULT_DATETIME_PATTERN);
+        String backupPath = constructPath(STORAGE_ROOT, Constant.BACKUP_STORAGE_NAME, String.format("img-backup-%s~%s", DateTools.dateFormat(start, DateTools.CUSTOM_DATETIME_PATTERN), DateTools.dateFormat(end, DateTools.CUSTOM_DATETIME_PATTERN)));
 
         // todo: step2. query database to get the backup item list
-        String start = "2018-01-01 00:00:00";
-        String end = DateTools.currentTimeStr();
-        List<ImageDTO> list = imageDAO.getByRangeTime(start, end);
+        List<SoGallery> list = gallery.stream().filter(SoGallery.CREATE_TIME.between(convertToTimestamp(vo.getStartTime()), convertToTimestamp(vo.getEndTime()))).collect(Collectors.toList());
 
         // todo: step3. move data to backup folder according to backup item list
-        for (ImageDTO imageDTO : list) {
-            String imagePath = getImagePath(imageDTO.getImageId());
-            FileTools.copyFileToDir(new File(imagePath), getBackupDir());
+        for (SoGallery image : list) {
+            String imagePath = getLocalImagePath(image.getId());
+
+            String backupImgPath = constructPath(backupPath, "GalleryStorage", image.getPath().substring(0, image.getPath().lastIndexOf(".") - 33));
+            File backupImgFile = new File(backupImgPath);
+            if (!backupImgFile.exists()) {
+                backupImgFile.mkdirs();
+            }
+
+            FileTools.copyFileToDir(new File(imagePath), backupImgFile);
         }
+        FileTools.writeString(constructPath(backupPath, Constant.IMG_DATA_OUTPUT_FILE_NAME), JSON.toJSONString(list));
 
         // todo: step4. compress backup folder
 
+
         // todo: step5. transfer backup zip file to NAS
 
-        return null;
+        return CommonDTO.create(HttpStatus.OK, String.format("backup successfully, output to: %s", backupPath));
     }
 
     @Override
-    public String recover() throws IOException {
-        String backupPath = "G:\\2-实验目录\\3-CodeTest\\ImageServBackup";
-        SoGalleryManager gallery = app.getOrThrow(SoGalleryManager.class);
-        String imgDataJsonStr = FileTools.readToString(backupPath + File.separator + IMG_DATABASE_JSON_NAME);
+    public CommonDTO recover(ImageVO vo) throws IOException {
+        String imageDataPath = constructPath(STORAGE_ROOT, Constant.BACKUP_STORAGE_NAME, vo.getRecoverVersion(), Constant.IMG_DATA_OUTPUT_FILE_NAME);
+        String imgDataJsonStr = FileTools.readToString(imageDataPath);
         JSONArray imgDataJsonArray = JSON.parseArray(imgDataJsonStr);
         for (Object o : imgDataJsonArray) {
             ImageDTO img = JSON.parseObject(o.toString(), ImageDTO.class);
             gallery.merge(gallery.create()
                     .setId(img.getImageId())
-                    .setTitle(StringTools.getOrDefault(img.getAlias(), img.getCreateTime()))
+                    .setTitle(getOrDefault(img.getAlias(), img.getCreateTime()))
                     .setFormat(img.getImgFormat())
                     .setSize(img.getImgSize())
                     .setResolution(img.getResolutionRatio())
                     .setPath(img.getPath())
-                    .setCreateTime(new Timestamp(DateTools.toDate(img.getCreateTime(), DateTools.DEFAULT_DATETIME_PATTERN).getTime()))
-                    .setUpdateTime(new Timestamp(DateTools.toDate(img.getUploadTime(), DateTools.DEFAULT_DATETIME_PATTERN).getTime())));
+                    .setCreateTime(convertToTimestamp(img.getCreateTime()))
+                    .setUploadTime(convertToTimestamp(img.getUploadTime())));
         }
-        return "success";
+        return CommonDTO.create(HttpStatus.OK, "recover successfully.");
     }
 
-    /**
-     * 获取数据备份路径File
-     *
-     * @return
-     */
-    private File getBackupDir() {
-        File file = new File(backupDir);
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        return file;
+    private String getLocalImagePath(String imageId) {
+        Optional<SoGallery> optional = gallery.stream().filter(SoGallery.ID.equal(imageId)).findFirst();
+        return optional.isPresent() ? constructPath(STORAGE_ROOT, IMG_STORAGE_NAME, optional.get().getPath()) : "";
     }
 
-    private String getImagePath(String imageId) {
-        return imgDir + imageId;
+    private String getLocalImagePath(SoGallery image) {
+        return STORAGE_ROOT + File.separator + image.getPath();
     }
 
-    private void deleteSingleImg(String imgId) throws IOException {
-        String imgPath = imgDir + imageDAO.findLocalPathById(imgId);
-        imageDAO.deleteByIds(Arrays.asList(imgId));
-        File file = new File(imgPath);
+    private void deleteImage(String imgId) throws IOException {
+        // delete file
+        String localPath = getLocalImagePath(imgId);
+        File file = new File(localPath);
         if (file.exists()) {
             file.delete();
         }
+        // delete record
+        gallery.remove(gallery.create().setId(imgId));
     }
 
-    private void batchDeleteImg(List<String> imgIds) throws IOException {
-        List<String> localPaths = imageDAO.findLocalPathByIds(imgIds);
-        imageDAO.deleteByIds(imgIds);
-        localPaths.forEach(path -> {
-            String imgPath = imgDir + path;
+    private void deleteImages(List<String> imgIds) throws IOException {
+        // delete files
+        gallery.stream().filter(SoGallery.ID.in(imgIds)).forEach(image -> {
+            String imgPath = getLocalImagePath(image);
             File file = new File(imgPath);
             if (file.exists()) {
                 file.delete();
             }
         });
+        // delete records
+        gallery.stream().filter(SoGallery.ID.in(imgIds)).forEach(gallery.remover());
     }
 
 

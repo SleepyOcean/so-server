@@ -1,7 +1,7 @@
 package com.sleepy.common.exception;
 
-import com.alibaba.fastjson.JSON;
 import com.sleepy.common.constant.HttpStatus;
+import com.sleepy.common.http.CommonDTO;
 import com.sleepy.common.tools.LogTools;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,16 +18,16 @@ public class GlobalRequestExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     @ResponseBody
-    public String handleServiceException(Exception e) {
+    public CommonDTO handleServiceException(Exception e) {
         LogTools.logExceptionInfo(e);
-        return JSON.toJSON(GlobalExceptionMessage.getExceptionMessage(HttpStatus.INTERNAL_ERROR.code(), e.getMessage())).toString();
+        return CommonDTO.create(HttpStatus.INTERNAL_ERROR, e.getMessage());
     }
 
     @ExceptionHandler(Throwable.class)
     @ResponseBody
-    public String handleIllegalParamException(Throwable throwable) {
+    public CommonDTO handleIllegalParamException(Throwable throwable) {
         LogTools.logExceptionInfo(throwable);
-        return JSON.toJSON(GlobalExceptionMessage.getExceptionMessage(HttpStatus.INTERNAL_ERROR.code(), throwable.getMessage())).toString();
+        return CommonDTO.create(HttpStatus.INTERNAL_ERROR, throwable.getMessage());
     }
 
 }

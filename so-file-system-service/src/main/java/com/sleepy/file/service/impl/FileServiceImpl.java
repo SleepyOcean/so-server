@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class FileServiceImpl implements FileService {
     private static String CHUNK_SUFFIX = ".chunk";
-    @Value("${rootDir}")
+    @Value("${storage}")
     private String rootDir;
     private String currentPath = "FileServer";
     private ConcurrentHashMap<String, String> uploadFileMap = new ConcurrentHashMap<>(4);

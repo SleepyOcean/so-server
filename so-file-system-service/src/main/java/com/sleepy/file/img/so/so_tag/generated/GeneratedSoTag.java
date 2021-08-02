@@ -77,7 +77,7 @@ public interface GeneratedSoTag {
      * @return this SoTag instance
      */
     SoTag setTagName(String tagName);
-
+    
     enum Identifier implements ColumnIdentifier<SoTag> {
 
         ID("id"),

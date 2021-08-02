@@ -26,11 +26,11 @@ public abstract class GeneratedSoGalleryImpl implements SoGallery {
     private String format;
     private String path;
     private String resolution;
-    private String description;
     private String title;
+    private String description;
     private String tag;
     private Timestamp createTime;
-    private Timestamp updateTime;
+    private Timestamp uploadTime;
 
     protected GeneratedSoGalleryImpl() {
     }
@@ -61,28 +61,28 @@ public abstract class GeneratedSoGalleryImpl implements SoGallery {
     }
 
     @Override
-    public Optional<String> getDescription() {
-        return Optional.ofNullable(description);
-    }
-
-    @Override
     public String getTitle() {
         return title;
     }
 
     @Override
-    public String getTag() {
-        return tag;
+    public Optional<String> getDescription() {
+        return Optional.ofNullable(description);
     }
 
     @Override
-    public Optional<Timestamp> getCreateTime() {
-        return Optional.ofNullable(createTime);
+    public Optional<String> getTag() {
+        return Optional.ofNullable(tag);
     }
 
     @Override
-    public Optional<Timestamp> getUpdateTime() {
-        return Optional.ofNullable(updateTime);
+    public Timestamp getCreateTime() {
+        return createTime;
+    }
+
+    @Override
+    public Timestamp getUploadTime() {
+        return uploadTime;
     }
 
     @Override
@@ -116,14 +116,14 @@ public abstract class GeneratedSoGalleryImpl implements SoGallery {
     }
 
     @Override
-    public SoGallery setDescription(String description) {
-        this.description = description;
+    public SoGallery setTitle(String title) {
+        this.title = title;
         return this;
     }
 
     @Override
-    public SoGallery setTitle(String title) {
-        this.title = title;
+    public SoGallery setDescription(String description) {
+        this.description = description;
         return this;
     }
 
@@ -140,8 +140,8 @@ public abstract class GeneratedSoGalleryImpl implements SoGallery {
     }
 
     @Override
-    public SoGallery setUpdateTime(Timestamp updateTime) {
-        this.updateTime = updateTime;
+    public SoGallery setUploadTime(Timestamp uploadTime) {
+        this.uploadTime = uploadTime;
         return this;
     }
 
@@ -153,11 +153,11 @@ public abstract class GeneratedSoGalleryImpl implements SoGallery {
         sj.add("format = " + Objects.toString(getFormat()));
         sj.add("path = " + Objects.toString(getPath()));
         sj.add("resolution = " + Objects.toString(getResolution()));
-        sj.add("description = " + Objects.toString(OptionalUtil.unwrap(getDescription())));
         sj.add("title = " + Objects.toString(getTitle()));
-        sj.add("tag = " + Objects.toString(getTag()));
-        sj.add("createTime = " + Objects.toString(OptionalUtil.unwrap(getCreateTime())));
-        sj.add("updateTime = " + Objects.toString(OptionalUtil.unwrap(getUpdateTime())));
+        sj.add("description = " + Objects.toString(OptionalUtil.unwrap(getDescription())));
+        sj.add("tag = " + Objects.toString(OptionalUtil.unwrap(getTag())));
+        sj.add("createTime = " + Objects.toString(getCreateTime()));
+        sj.add("uploadTime = " + Objects.toString(getUploadTime()));
         return "SoGalleryImpl " + sj.toString();
     }
 
@@ -185,10 +185,10 @@ public abstract class GeneratedSoGalleryImpl implements SoGallery {
         if (!Objects.equals(this.getResolution(), thatSoGallery.getResolution())) {
             return false;
         }
-        if (!Objects.equals(this.getDescription(), thatSoGallery.getDescription())) {
+        if (!Objects.equals(this.getTitle(), thatSoGallery.getTitle())) {
             return false;
         }
-        if (!Objects.equals(this.getTitle(), thatSoGallery.getTitle())) {
+        if (!Objects.equals(this.getDescription(), thatSoGallery.getDescription())) {
             return false;
         }
         if (!Objects.equals(this.getTag(), thatSoGallery.getTag())) {
@@ -197,7 +197,7 @@ public abstract class GeneratedSoGalleryImpl implements SoGallery {
         if (!Objects.equals(this.getCreateTime(), thatSoGallery.getCreateTime())) {
             return false;
         }
-        if (!Objects.equals(this.getUpdateTime(), thatSoGallery.getUpdateTime())) {
+        if (!Objects.equals(this.getUploadTime(), thatSoGallery.getUploadTime())) {
             return false;
         }
         return true;
@@ -211,11 +211,11 @@ public abstract class GeneratedSoGalleryImpl implements SoGallery {
         hash = 31 * hash + Objects.hashCode(getFormat());
         hash = 31 * hash + Objects.hashCode(getPath());
         hash = 31 * hash + Objects.hashCode(getResolution());
-        hash = 31 * hash + Objects.hashCode(OptionalUtil.unwrap(getDescription()));
         hash = 31 * hash + Objects.hashCode(getTitle());
-        hash = 31 * hash + Objects.hashCode(getTag());
-        hash = 31 * hash + Objects.hashCode(OptionalUtil.unwrap(getCreateTime()));
-        hash = 31 * hash + Objects.hashCode(OptionalUtil.unwrap(getUpdateTime()));
+        hash = 31 * hash + Objects.hashCode(OptionalUtil.unwrap(getDescription()));
+        hash = 31 * hash + Objects.hashCode(OptionalUtil.unwrap(getTag()));
+        hash = 31 * hash + Objects.hashCode(getCreateTime());
+        hash = 31 * hash + Objects.hashCode(getUploadTime());
         return hash;
     }
 }

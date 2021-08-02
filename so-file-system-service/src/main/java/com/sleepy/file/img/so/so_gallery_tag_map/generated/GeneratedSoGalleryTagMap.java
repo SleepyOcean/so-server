@@ -78,7 +78,7 @@ public interface GeneratedSoGalleryTagMap {
      * @return this SoGalleryTagMap instance
      */
     SoGalleryTagMap setObjId(String objId);
-
+    
     enum Identifier implements ColumnIdentifier<SoGalleryTagMap> {
 
         TAG_ID("tag_id"),

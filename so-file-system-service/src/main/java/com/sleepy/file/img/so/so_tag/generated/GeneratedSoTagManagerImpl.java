@@ -48,7 +48,7 @@ public abstract class GeneratedSoTagManagerImpl
     @Override
     public Stream<Field<SoTag>> primaryKeyFields() {
         return Stream.of(
-                SoTag.ID
+            SoTag.ID
         );
     }
 }

@@ -82,17 +82,6 @@ public interface GeneratedSoGallery {
     );
     /**
      * This Field corresponds to the {@link SoGallery} field that can be
-     * obtained using the {@link SoGallery#getDescription()} method.
-     */
-    StringField<SoGallery, String> DESCRIPTION = StringField.create(
-            Identifier.DESCRIPTION,
-            o -> OptionalUtil.unwrap(o.getDescription()),
-            SoGallery::setDescription,
-            TypeMapper.identity(),
-            false
-    );
-    /**
-     * This Field corresponds to the {@link SoGallery} field that can be
      * obtained using the {@link SoGallery#getTitle()} method.
      */
     StringField<SoGallery, String> TITLE = StringField.create(
@@ -104,11 +93,22 @@ public interface GeneratedSoGallery {
     );
     /**
      * This Field corresponds to the {@link SoGallery} field that can be
+     * obtained using the {@link SoGallery#getDescription()} method.
+     */
+    StringField<SoGallery, String> DESCRIPTION = StringField.create(
+            Identifier.DESCRIPTION,
+            o -> OptionalUtil.unwrap(o.getDescription()),
+            SoGallery::setDescription,
+            TypeMapper.identity(),
+            false
+    );
+    /**
+     * This Field corresponds to the {@link SoGallery} field that can be
      * obtained using the {@link SoGallery#getTag()} method.
      */
     StringField<SoGallery, String> TAG = StringField.create(
             Identifier.TAG,
-            SoGallery::getTag,
+            o -> OptionalUtil.unwrap(o.getTag()),
             SoGallery::setTag,
             TypeMapper.identity(),
             false
@@ -119,19 +119,19 @@ public interface GeneratedSoGallery {
      */
     ComparableField<SoGallery, Timestamp, Timestamp> CREATE_TIME = ComparableField.create(
             Identifier.CREATE_TIME,
-            o -> OptionalUtil.unwrap(o.getCreateTime()),
+            SoGallery::getCreateTime,
             SoGallery::setCreateTime,
             TypeMapper.identity(),
             false
     );
     /**
      * This Field corresponds to the {@link SoGallery} field that can be
-     * obtained using the {@link SoGallery#getUpdateTime()} method.
+     * obtained using the {@link SoGallery#getUploadTime()} method.
      */
-    ComparableField<SoGallery, Timestamp, Timestamp> UPDATE_TIME = ComparableField.create(
-            Identifier.UPDATE_TIME,
-            o -> OptionalUtil.unwrap(o.getUpdateTime()),
-            SoGallery::setUpdateTime,
+    ComparableField<SoGallery, Timestamp, Timestamp> UPLOAD_TIME = ComparableField.create(
+            Identifier.UPLOAD_TIME,
+            SoGallery::getUploadTime,
+            SoGallery::setUploadTime,
             TypeMapper.identity(),
             false
     );
@@ -177,14 +177,6 @@ public interface GeneratedSoGallery {
     String getResolution();
 
     /**
-     * Returns the description of this SoGallery. The description field
-     * corresponds to the database column dev.dev.so_gallery.description.
-     *
-     * @return the description of this SoGallery
-     */
-    Optional<String> getDescription();
-
-    /**
      * Returns the title of this SoGallery. The title field corresponds to the
      * database column dev.dev.so_gallery.title.
      *
@@ -193,12 +185,20 @@ public interface GeneratedSoGallery {
     String getTitle();
 
     /**
+     * Returns the description of this SoGallery. The description field
+     * corresponds to the database column dev.dev.so_gallery.description.
+     *
+     * @return the description of this SoGallery
+     */
+    Optional<String> getDescription();
+
+    /**
      * Returns the tag of this SoGallery. The tag field corresponds to the
      * database column dev.dev.so_gallery.tag.
      *
      * @return the tag of this SoGallery
      */
-    String getTag();
+    Optional<String> getTag();
 
     /**
      * Returns the createTime of this SoGallery. The createTime field
@@ -206,15 +206,15 @@ public interface GeneratedSoGallery {
      *
      * @return the createTime of this SoGallery
      */
-    Optional<Timestamp> getCreateTime();
+    Timestamp getCreateTime();
 
     /**
-     * Returns the updateTime of this SoGallery. The updateTime field
-     * corresponds to the database column dev.dev.so_gallery.update_time.
+     * Returns the uploadTime of this SoGallery. The uploadTime field
+     * corresponds to the database column dev.dev.so_gallery.upload_time.
      *
-     * @return the updateTime of this SoGallery
+     * @return the uploadTime of this SoGallery
      */
-    Optional<Timestamp> getUpdateTime();
+    Timestamp getUploadTime();
 
     /**
      * Sets the id of this SoGallery. The id field corresponds to the database
@@ -233,7 +233,7 @@ public interface GeneratedSoGallery {
      * @return this SoGallery instance
      */
     SoGallery setSize(String size);
-
+    
     /**
      * Sets the format of this SoGallery. The format field corresponds to the
      * database column dev.dev.so_gallery.format.
@@ -242,7 +242,7 @@ public interface GeneratedSoGallery {
      * @return this SoGallery instance
      */
     SoGallery setFormat(String format);
-
+    
     /**
      * Sets the path of this SoGallery. The path field corresponds to the
      * database column dev.dev.so_gallery.path.
@@ -251,7 +251,7 @@ public interface GeneratedSoGallery {
      * @return this SoGallery instance
      */
     SoGallery setPath(String path);
-
+    
     /**
      * Sets the resolution of this SoGallery. The resolution field corresponds
      * to the database column dev.dev.so_gallery.resolution.
@@ -262,15 +262,6 @@ public interface GeneratedSoGallery {
     SoGallery setResolution(String resolution);
 
     /**
-     * Sets the description of this SoGallery. The description field corresponds
-     * to the database column dev.dev.so_gallery.description.
-     *
-     * @param description to set of this SoGallery
-     * @return this SoGallery instance
-     */
-    SoGallery setDescription(String description);
-
-    /**
      * Sets the title of this SoGallery. The title field corresponds to the
      * database column dev.dev.so_gallery.title.
      *
@@ -278,6 +269,15 @@ public interface GeneratedSoGallery {
      * @return this SoGallery instance
      */
     SoGallery setTitle(String title);
+
+    /**
+     * Sets the description of this SoGallery. The description field corresponds
+     * to the database column dev.dev.so_gallery.description.
+     *
+     * @param description to set of this SoGallery
+     * @return this SoGallery instance
+     */
+    SoGallery setDescription(String description);
 
     /**
      * Sets the tag of this SoGallery. The tag field corresponds to the database
@@ -298,13 +298,13 @@ public interface GeneratedSoGallery {
     SoGallery setCreateTime(Timestamp createTime);
 
     /**
-     * Sets the updateTime of this SoGallery. The updateTime field corresponds
-     * to the database column dev.dev.so_gallery.update_time.
+     * Sets the uploadTime of this SoGallery. The uploadTime field corresponds
+     * to the database column dev.dev.so_gallery.upload_time.
      *
-     * @param updateTime to set of this SoGallery
+     * @param uploadTime to set of this SoGallery
      * @return this SoGallery instance
      */
-    SoGallery setUpdateTime(Timestamp updateTime);
+    SoGallery setUploadTime(Timestamp uploadTime);
 
     enum Identifier implements ColumnIdentifier<SoGallery> {
 
@@ -313,11 +313,11 @@ public interface GeneratedSoGallery {
         FORMAT("format"),
         PATH("path"),
         RESOLUTION("resolution"),
-        DESCRIPTION("description"),
         TITLE("title"),
+        DESCRIPTION("description"),
         TAG("tag"),
         CREATE_TIME("create_time"),
-        UPDATE_TIME("update_time");
+        UPLOAD_TIME("upload_time");
 
         private final String columnId;
         private final TableIdentifier<SoGallery> tableIdentifier;
@@ -333,22 +333,22 @@ public interface GeneratedSoGallery {
         public String getDbmsId() {
             return "dev";
         }
-
+        
         @Override
         public String getSchemaId() {
             return "dev";
         }
-
+        
         @Override
         public String getTableId() {
             return "so_gallery";
         }
-
+        
         @Override
         public String getColumnId() {
             return this.columnId;
         }
-
+        
         @Override
         public TableIdentifier<SoGallery> asTableIdentifier() {
             return this.tableIdentifier;

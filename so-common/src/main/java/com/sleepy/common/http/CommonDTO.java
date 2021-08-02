@@ -1,5 +1,6 @@
 package com.sleepy.common.http;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.sleepy.common.constant.HttpStatus;
 import lombok.Getter;
 
@@ -13,6 +14,7 @@ import java.util.Map;
  * @create 2019-04-20 13:28
  */
 @Getter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CommonDTO<T> {
     private T result;
     private List<T> resultList;
