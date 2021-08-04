@@ -1,16 +1,17 @@
+spring:
+  application:
+    name: so-file-system-service
 server:
   port: 9020
   tomcat:
     uri-encoding: UTF-8
-    max-threads: 100
-spring:
-  jackson:
-    default-property-inclusion: non_null
+    max-threads: 8
   servlet:
     multipart:
       max-file-size: 10485760
       max-request-size: 104857600
 logging:
+  config: classpath:logback-spring.xml
   level:
     root: error
     com.sleepy: info

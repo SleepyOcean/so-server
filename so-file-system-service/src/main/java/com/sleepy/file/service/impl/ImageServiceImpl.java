@@ -56,6 +56,7 @@ public class ImageServiceImpl implements ImageService {
 
         File file = new File(imgPath);
         if (!file.exists()) {
+            log.warn("image does not exist for id[{}], path=[{}]", id, imgPath);
             return new byte[0];
         }
         FileInputStream inputStream = new FileInputStream(file);
@@ -141,6 +142,7 @@ public class ImageServiceImpl implements ImageService {
         } catch (Exception e) {
             File file = new File(absolutePath);
             file.delete();
+            log.error("image save error", e);
             return CommonDTO.create(HttpStatus.INTERNAL_ERROR, e.getMessage());
         }
 
