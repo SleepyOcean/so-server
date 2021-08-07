@@ -69,6 +69,13 @@
             <version>6.6</version>
         </dependency>
 
+        <!--统一配置 Nacos-->
+        <dependency>
+            <groupId>com.alibaba.boot</groupId>
+            <artifactId>nacos-config-spring-boot-starter</artifactId>
+            <version>0.2.10</version>
+        </dependency>
+
     </dependencies>
 
     <build>

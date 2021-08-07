@@ -2,6 +2,7 @@ package com.sleepy.file.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.nacos.api.config.annotation.NacosValue;
 import com.sleepy.common.constant.HttpStatus;
 import com.sleepy.common.http.CommonDTO;
 import com.sleepy.common.model.MapModel;
@@ -48,6 +49,9 @@ public class ImageServiceImpl implements ImageService {
     private String STORAGE_ROOT;
     @Autowired
     SoGalleryManager gallery;
+
+    @NacosValue(value = "${image-backup-automatic-switch:false}", autoRefreshed = true)
+    private String autoBackup;
 
     @Override
     public byte[] getImg(HttpServletResponse response, String id) throws IOException {
@@ -167,6 +171,8 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public CommonDTO backup(ImageVO vo) throws IOException {
+        log.info("image auto backup status: [{}]", autoBackup);
+
         // todo: step1. get backup data time range
         Date start = DateTools.toDate(vo.getStartTime(), DEFAULT_DATETIME_PATTERN);
         Date end = DateTools.toDate(vo.getEndTime(), DEFAULT_DATETIME_PATTERN);
