@@ -1,5 +1,6 @@
 package com.sleepy.common.tools;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -86,5 +87,26 @@ public class DateTools {
 
     public static String currentTimeStr() {
         return dateFormat(new Date());
+    }
+
+    /**
+     * 通过时间字符串创建Timestamp
+     *
+     * @param timeStr        时间字符串
+     * @param timeStrPattern 时间字符串格式
+     * @return
+     */
+    public static Timestamp createTimestamp(String timeStr, String timeStrPattern) {
+        return new Timestamp(toDate(timeStr, timeStrPattern).getTime());
+    }
+
+    /**
+     * 将默认日期字符串转为Timestamp
+     *
+     * @param dateStr 格式为 yyyy-MM-dd HH:mm:ss 的日期字符串
+     * @return
+     */
+    public static Timestamp convertToTimestamp(String dateStr) {
+        return createTimestamp(dateStr, DEFAULT_DATETIME_PATTERN);
     }
 }

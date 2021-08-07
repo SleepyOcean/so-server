@@ -1,5 +1,7 @@
 package com.sleepy.file.controller;
 
+import com.sleepy.common.constant.HttpStatus;
+import com.sleepy.common.http.CommonDTO;
 import com.sleepy.file.service.ImageService;
 import com.sleepy.file.vo.ImageVO;
 import com.sleepy.file.vo.ImgSearchVO;
@@ -10,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * 图片服务
@@ -44,7 +45,7 @@ public class ImageController {
 
     @PostMapping("/search")
     @ResponseBody
-    public Map<String, Object> search(@RequestBody ImgSearchVO vo) throws IOException {
+    public CommonDTO search(@RequestBody ImgSearchVO vo) throws IOException {
         return imageService.search(vo);
     }
 
@@ -56,7 +57,7 @@ public class ImageController {
      * @throws IOException
      */
     @PostMapping("/save")
-    public String saveImage(@RequestBody ImageVO vo) throws IOException {
+    public CommonDTO saveImage(@RequestBody ImageVO vo) throws IOException {
         return imageService.upload(vo);
     }
 
@@ -68,11 +69,21 @@ public class ImageController {
      * @throws IOException
      */
     @PostMapping("/delete")
-    public String deleteImage(@RequestBody @Valid ImageVO vo) throws IOException {
+    public CommonDTO deleteImage(@RequestBody @Valid ImageVO vo) throws IOException {
         if ("4352".equals(vo.getEditCode())) {
             return imageService.delete(vo);
         } else {
-            return "editCode 错误!操作失败";
+            return CommonDTO.create(HttpStatus.BAD_REQUEST, "editCode 错误!操作失败");
         }
+    }
+
+    @PostMapping("/backup")
+    public CommonDTO backup(@RequestBody @Valid ImageVO vo) throws IOException {
+        return imageService.backup(vo);
+    }
+
+    @PostMapping("/recover")
+    public CommonDTO recover(@RequestBody @Valid ImageVO vo) throws IOException {
+        return imageService.recover(vo);
     }
 }

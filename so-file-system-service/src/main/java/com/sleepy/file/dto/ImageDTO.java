@@ -1,5 +1,6 @@
 package com.sleepy.file.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 /**
@@ -9,6 +10,7 @@ import lombok.Data;
  * @create 2020-03-06 16:14
  **/
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ImageDTO {
 
     private String imageId;

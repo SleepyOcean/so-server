@@ -17,4 +17,10 @@ public class Constant {
     public static final String IMG_TYPE_OTHERS = "其他";
     public static final String IMG_TYPE_GALLERY = "Gallery";
     public static final String IMG_TYPE_WALLPAPER = "壁纸";
+
+    public static final String FILE_STORAGE_NAME = "FileStorage";
+    public static final String IMG_STORAGE_NAME = "ImgStorage";
+    public static final String BACKUP_STORAGE_NAME = "BackupStorage";
+    public static final String IMG_DIR_OUTPUT_PREFIX = "img-backup-";
+    public static final String IMG_DATA_OUTPUT_FILE_NAME = "image-database.json";
 }
