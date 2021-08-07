@@ -20,4 +20,12 @@ public class ImageVO extends ImageDTO {
     private String editCode;
 
     private List<String> imgIds;
+
+    private String deleteType;
+
+    private String startTime;
+
+    private String endTime;
+
+    private String recoverVersion;
 }

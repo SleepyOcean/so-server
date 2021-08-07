@@ -193,6 +193,17 @@ public class FileTools {
         }
     }
 
+    public static String constructPath(String... path) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < path.length; i++) {
+            sb.append(path[i]);
+            if (i != path.length - 1) {
+                sb.append(File.separatorChar);
+            }
+        }
+        return sb.toString();
+    }
+
     /**
      * 图片EXIF信息获取
      */

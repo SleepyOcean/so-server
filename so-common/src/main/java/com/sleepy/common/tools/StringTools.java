@@ -208,4 +208,8 @@ public class StringTools {
             return b.divide(one, scale, BigDecimal.ROUND_UP).toString();
         }
     }
+
+    public static String getOrDefault(String str, String defaultStr) {
+        return isNullOrEmpty(str) ? defaultStr : str;
+    }
 }

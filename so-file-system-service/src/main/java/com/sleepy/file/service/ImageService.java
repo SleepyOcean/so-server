@@ -1,11 +1,11 @@
 package com.sleepy.file.service;
 
+import com.sleepy.common.http.CommonDTO;
 import com.sleepy.file.vo.ImageVO;
 import com.sleepy.file.vo.ImgSearchVO;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * @author SleepyOcean
@@ -46,7 +46,7 @@ public interface ImageService {
      * @param vo
      * @return
      */
-    Map<String, Object> search(ImgSearchVO vo) throws IOException;
+    CommonDTO search(ImgSearchVO vo) throws IOException;
 
     /**
      * 上传图片
@@ -55,7 +55,7 @@ public interface ImageService {
      * @return
      * @throws IOException
      */
-    String upload(ImageVO vo) throws IOException;
+    CommonDTO upload(ImageVO vo) throws IOException;
 
     /**
      * 删除图片
@@ -63,5 +63,24 @@ public interface ImageService {
      * @param vo
      * @return
      */
-    String delete(ImageVO vo) throws IOException;
+    CommonDTO delete(ImageVO vo) throws IOException;
+
+    /**
+     * 备份图片数据
+     *
+     * @param vo
+     * @return
+     * @throws IOException
+     */
+    CommonDTO backup(ImageVO vo) throws IOException;
+
+    /**
+     * 恢复图片数据
+     *
+     * @param vo
+     * @return
+     * @throws IOException
+     */
+    CommonDTO recover(ImageVO vo) throws IOException;
+
 }
