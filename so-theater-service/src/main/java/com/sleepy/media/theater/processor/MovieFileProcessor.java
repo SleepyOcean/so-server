@@ -22,7 +22,7 @@ import java.util.*;
  **/
 @Component
 public class MovieFileProcessor {
-    Set<String> videoFormat = Sets.newHashSet(".mkv", ".mp4", ".m2ts", ".avi", ".MKV", ".m4v");
+    Set<String> videoFormat = Sets.newHashSet(".mkv", ".mp4", ".m2ts", ".avi", ".MKV", ".m4v", ".wmv");
     Set<String> subtitleFormat = Sets.newHashSet(".idx", ".ssa", ".srt", ".sub", ".SRT", ".sup", ".ass");
     Set<String> formatSet = new HashSet<>();
     List<String> errorList = new ArrayList<>();
@@ -348,6 +348,12 @@ public class MovieFileProcessor {
         }
     }
 
+    /**
+     * Page18整理方法： 将sourceDir目录下的所有视频文件移动到toDir
+     *
+     * @param sourceDir
+     * @param toDir
+     */
     public void regularPage18Video(String sourceDir, String toDir) {
         File dirFile = new File(sourceDir);
         List<File> videoFiles = new ArrayList<>();

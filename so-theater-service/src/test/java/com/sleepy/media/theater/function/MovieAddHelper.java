@@ -25,6 +25,7 @@ public class MovieAddHelper {
     static String newMovieDirPath = "G:\\3-院线上新";
     static String fakeFileOutputPath = "G:\\2-实验目录\\1-FakeDir";
     static String matchFileOutputPath = "G:\\2-实验目录\\2-MatchDir";
+    static String HELPER_NAME = "Movie";
 
 
     /**
