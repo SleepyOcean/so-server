@@ -1,6 +1,7 @@
 package com.sleepy.blog.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.nacos.api.config.annotation.NacosValue;
 import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.blog.processor.ScheduleProcessor;
 import com.sleepy.blog.service.CustomService;
@@ -35,7 +36,8 @@ public class CustomServiceImpl implements CustomService {
     @Autowired
     StringRedisTemplate stringRedisTemplate;
 
-    private String key = "key";
+    @NacosValue(value = "${so.schedule.auto-send-message.key:key}", autoRefreshed = true)
+    private String key;
 
     @Override
     public String requestGet(Map vo) {
