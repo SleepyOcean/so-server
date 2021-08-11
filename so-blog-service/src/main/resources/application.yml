@@ -31,10 +31,9 @@ spring:
       max-idle: 8
       min-idle: 2
 logging:
+  config: classpath:logback-spring.xml
   level:
     # 全局等级
     root: warn
     com:
       sleepy: info
-  file:
-    name: log\so-blog-server.log
