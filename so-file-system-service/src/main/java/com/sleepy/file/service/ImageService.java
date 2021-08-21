@@ -29,7 +29,7 @@ public interface ImageService {
      * @param id
      * @return
      */
-    byte[] getImgThumbnail(HttpServletResponse response, String id);
+    byte[] getImgThumbnail(HttpServletResponse response, String id) throws IOException;
 
     /**
      * 获取压缩图片

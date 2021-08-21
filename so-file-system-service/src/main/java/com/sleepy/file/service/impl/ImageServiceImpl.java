@@ -20,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -53,26 +55,47 @@ public class ImageServiceImpl implements ImageService {
     @NacosValue(value = "${image-backup-automatic-switch:false}", autoRefreshed = true)
     private String autoBackup;
 
+    @NacosValue(value = "${img-thumbnail-threshold:300}", autoRefreshed = true)
+    private int thumbnailThreshold;
+
+    @NacosValue(value = "${img-thumbnail-height:300}", autoRefreshed = true)
+    private int thumbnailHeight;
+
     @Override
     public byte[] getImg(HttpServletResponse response, String id) throws IOException {
+        // 1. 通过Id获取图片文件
         String imgPath = getLocalImagePath(id);
-        checkStr(imgPath);
-
         File file = new File(imgPath);
         if (!file.exists()) {
             log.warn("image does not exist for id[{}], path=[{}]", id, imgPath);
             return new byte[0];
         }
-        FileInputStream inputStream = new FileInputStream(file);
-        byte[] bytes = new byte[inputStream.available()];
-        inputStream.read(bytes, 0, inputStream.available());
-        inputStream.close();
-        return bytes;
+
+        // 2. 通过图片文件获取图片流
+        return getImgStream(file);
     }
 
     @Override
-    public byte[] getImgThumbnail(HttpServletResponse response, String id) {
+    public byte[] getImgThumbnail(HttpServletResponse response, String id) throws IOException {
         // todo 获取图片缩略图
+        String imgPath = getLocalImagePath(id);
+        File file = new File(imgPath);
+        if (!file.exists()) {
+            log.warn("image does not exist for id[{}], path=[{}]", id, imgPath);
+            return new byte[0];
+        }
+        // 1. 判断图片大小，默认小于300K的图片不压缩
+        if (file.length() < thumbnailThreshold * 1024) {
+            return getImgStream(file);
+        }
+        // 2. 压缩到指定高度
+        BufferedImage bufferedImage = ImageIO.read(file);
+        int srcHeight = bufferedImage.getHeight();
+        int srcWidth = bufferedImage.getWidth();
+
+        int destHeigh = thumbnailHeight;
+        int destWidth = srcWidth * destHeigh / destHeigh;
+        Thumbnails.of(imgPath).size(destWidth, destHeigh).outputFormat("jpeg").toOutputStream(response.getOutputStream());
         return new byte[0];
     }
 
@@ -107,7 +130,7 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public CommonDTO search(ImgSearchVO vo) throws IOException {
         long total = gallery.stream().count();
-        List<SoGallery> data = gallery.stream().sorted(Comparator.comparing(SoGallery::getUploadTime).reversed()).skip(vo.getPageStart() * vo.getPageSize()).limit(vo.getPageSize()).collect(Collectors.toList());
+        List<SoGallery> data = gallery.stream().sorted(Comparator.comparing(SoGallery::getUploadTime).reversed()).skip(vo.getPageStart()).limit(vo.getPageSize()).collect(Collectors.toList());
         return CommonDTO.create(HttpStatus.OK, "search is done.").setResultList(data).setTotal(total);
     }
 
@@ -223,9 +246,26 @@ public class ImageServiceImpl implements ImageService {
         return CommonDTO.create(HttpStatus.OK, "recover successfully.");
     }
 
+    /**
+     * 通过图片文件获取图片流
+     *
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    private byte[] getImgStream(File file) throws IOException {
+        FileInputStream inputStream = new FileInputStream(file);
+        byte[] bytes = new byte[inputStream.available()];
+        inputStream.read(bytes, 0, inputStream.available());
+        inputStream.close();
+        return bytes;
+    }
+
     private String getLocalImagePath(String imageId) {
         Optional<SoGallery> optional = gallery.stream().filter(SoGallery.ID.equal(imageId)).findFirst();
-        return optional.isPresent() ? constructPath(STORAGE_ROOT, IMG_STORAGE_NAME, optional.get().getPath()) : "";
+        String imgPath = optional.isPresent() ? constructPath(STORAGE_ROOT, IMG_STORAGE_NAME, optional.get().getPath()) : "";
+        checkStr(imgPath);
+        return imgPath;
     }
 
     private String getLocalImagePath(SoGallery image) {
