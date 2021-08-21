@@ -163,14 +163,14 @@ public class ImageServiceImpl implements ImageService {
                     .setFormat(imgMeta.get("图片格式").toString())
                     .setResolution(imgMeta.get("宽") + " × " + imgMeta.get("高"))
                     .setPath(absolutePath.substring(constructPath(STORAGE_ROOT, IMG_STORAGE_NAME).length()))
-                    .setCreateTime(convertToTimestamp(getOrDefault(imgMeta.get("创建时间").toString(), currentTime)))
+                    .setCreateTime(convertToTimestamp(imgMeta.getOrDefault("创建时间", currentTime).toString()))
                     .setUploadTime(new Timestamp(System.currentTimeMillis()));
             gallery.persist(entity);
         } catch (Exception e) {
             File file = new File(absolutePath);
             file.delete();
-            log.error("image save error", e.getStackTrace());
-            return CommonDTO.create(HttpStatus.INTERNAL_ERROR, e.getMessage());
+            log.error("image save error", e);
+            return CommonDTO.createError(HttpStatus.INTERNAL_ERROR, e.getMessage());
         }
 
         return CommonDTO.create(HttpStatus.OK, "The image is uploaded successfully.")
