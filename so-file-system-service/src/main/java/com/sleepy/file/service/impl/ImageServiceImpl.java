@@ -94,7 +94,7 @@ public class ImageServiceImpl implements ImageService {
         int srcWidth = bufferedImage.getWidth();
 
         int destHeigh = thumbnailHeight;
-        int destWidth = srcWidth * destHeigh / destHeigh;
+        int destWidth = srcWidth * destHeigh / srcHeight;
         Thumbnails.of(imgPath).size(destWidth, destHeigh).outputFormat("jpeg").toOutputStream(response.getOutputStream());
         return new byte[0];
     }
@@ -169,7 +169,7 @@ public class ImageServiceImpl implements ImageService {
         } catch (Exception e) {
             File file = new File(absolutePath);
             file.delete();
-            log.error("image save error", e);
+            log.error("image save error", e.getStackTrace());
             return CommonDTO.create(HttpStatus.INTERNAL_ERROR, e.getMessage());
         }
 
