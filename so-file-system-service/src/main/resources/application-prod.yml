@@ -1,3 +1,11 @@
 nacos:
   config:
     server-addr: 192.168.31.160:8848
+
+jdbc:
+  mysql:
+    address: mysql.sleepyocean.cn
+    port: 8000
+    database: so
+    username: root
+    password: 123456

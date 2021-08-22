@@ -1,3 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:mysql://mysql.sleepyocean.cn:8000/so?charset=utf8mb4&serverTimezone=UTC
+    username: root
+    password: 123456
+  redis:
+    host: redis.sleepyocean.cn
+
 nacos:
   config:
     server-addr: 192.168.31.160:8848

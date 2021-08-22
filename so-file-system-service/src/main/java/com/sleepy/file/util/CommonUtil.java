@@ -29,7 +29,7 @@ public class CommonUtil {
     public static List<String> IMAGE_SUFFIX_SET;
 
     static {
-        AUDIO_SUFFIX_SET = Arrays.asList(".mp3", ".wav", ".flac", ".aac", ".wma");
+        AUDIO_SUFFIX_SET = Arrays.asList(".mp3", ".wav", ".flac", ".aac", ".wma", "m4a", "ape");
         VIDEO_SUFFIX_SET = Arrays.asList(".rmvb", ".flv", ".mpg", ".mp4", ".mkv");
         IMAGE_SUFFIX_SET = Arrays.asList(".gif", ".jpg", ".jpeg", ".png");
     }

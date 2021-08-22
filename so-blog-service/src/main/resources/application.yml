@@ -6,10 +6,6 @@ server:
 spring:
   profiles:
     active: prod
-  datasource:
-    url: jdbc:mysql://mysql.sleepyocean.cn:8000/so?charset=utf8mb4&serverTimezone=UTC
-    username: root
-    password: 123456
   jpa:
     database: MYSQL
     show-sql: false
@@ -25,7 +21,6 @@ spring:
       max-file-size: 10485760
       max-request-size: 104857600
   redis:
-    host: redis.sleepyocean.cn
     port: 8015
     timeout: 3000
     jedis.pool:

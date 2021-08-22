@@ -4,6 +4,7 @@ import com.sleepy.file.FileApplication;
 import com.sleepy.file.FileApplicationBuilder;
 import com.sleepy.file.img.so.so_gallery.SoGalleryManager;
 import com.speedment.runtime.connector.mysql.MySqlBundle;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,10 +16,20 @@ import org.springframework.context.annotation.Configuration;
  **/
 @Configuration
 public class Setup {
+    @Value("${jdbc.mysql.address}")
+    private String address;
+    @Value("${jdbc.mysql.port}")
+    private int port;
+    @Value("${jdbc.mysql.database}")
+    private String database;
+    @Value("${jdbc.mysql.username}")
+    private String username;
+    @Value("${jdbc.mysql.password}")
+    private String password;
 
     @Bean
     public FileApplication createFileApplication() {
-        return new FileApplicationBuilder().withBundle(MySqlBundle.class).withIpAddress("mysql.sleepyocean.cn").withPort(8000).withSchema("so").withPassword("123456").build();
+        return new FileApplicationBuilder().withBundle(MySqlBundle.class).withIpAddress(address).withPort(port).withSchema(database).withUsername(username).withPassword(password).build();
     }
 
     @Bean
