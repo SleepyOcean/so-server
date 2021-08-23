@@ -1,8 +1,8 @@
 package com.sleepy.blog.controller;
 
 import com.sleepy.blog.dto.ChartOfBarDTO;
-import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.blog.service.StatisticsService;
+import com.sleepy.common.http.CommonDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;

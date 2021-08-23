@@ -1,7 +1,8 @@
 package com.sleepy.blog.aop;
 
-import com.sleepy.blog.dto.CommonDTO;
+import com.sleepy.common.constant.HttpStatus;
 import com.sleepy.common.exception.UserOperationIllegalException;
+import com.sleepy.common.http.CommonDTO;
 import com.sleepy.common.tools.LogTools;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ControllerInterceptor {
 
-    @Pointcut("execution(public com.sleepy.blog.dto.CommonDTO* com.sleepy.blog.controller.*.*(..))")
+    @Pointcut("execution(public com.sleepy.common.http.CommonDTO* com.sleepy.blog.controller.*.*(..))")
     public void controllerAnnotationPointCut() {
     }
 
@@ -41,20 +42,20 @@ public class ControllerInterceptor {
         try {
             Long startTime = System.currentTimeMillis();
             result = (CommonDTO<Object>) point.proceed();
-            result.setStatus(200);
+            result.setStatus(HttpStatus.OK);
             result.setTimeout((double) (System.currentTimeMillis() - startTime) / 1000);
         } catch (UserOperationIllegalException e) {
-            result.setStatus(503);
+            result.setStatus(HttpStatus.INTERNAL_ERROR);
             result.setMessage(e.getMessage());
             log.error("用户操作异常：" + e.getMessage());
         } catch (Exception e) {
             LogTools.logExceptionInfo(e);
-            result.setStatus(503);
+            result.setStatus(HttpStatus.INTERNAL_ERROR);
             result.setMessage(e.getMessage());
             log.error("serviceImpl异常：" + e.getMessage());
         } catch (Throwable throwable) {
             LogTools.logExceptionInfo(throwable);
-            result.setStatus(503);
+            result.setStatus(HttpStatus.INTERNAL_ERROR);
             result.setMessage(throwable.getMessage());
             log.error("Controller拦截器异常：" + throwable.getMessage());
         }

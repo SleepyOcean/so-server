@@ -1,11 +1,11 @@
 package com.sleepy.blog.controller;
 
-import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.blog.entity.ArticleEntity;
 import com.sleepy.blog.entity.CollectionEntity;
 import com.sleepy.blog.service.PostService;
 import com.sleepy.blog.vo.article.CollectionVO;
 import com.sleepy.blog.vo.article.PostVO;
+import com.sleepy.common.http.CommonDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

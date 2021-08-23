@@ -1,9 +1,9 @@
 package com.sleepy.blog.controller;
 
-import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.blog.entity.ProjectEntity;
 import com.sleepy.blog.service.ProjectService;
 import com.sleepy.blog.vo.ProjectVO;
+import com.sleepy.common.http.CommonDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,9 +1,9 @@
 package com.sleepy.blog.service.impl;
 
 import com.sleepy.blog.dto.ChartOfBarDTO;
-import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.blog.repository.ArticleRepository;
 import com.sleepy.blog.service.StatisticsService;
+import com.sleepy.common.http.CommonDTO;
 import com.sleepy.common.tools.DateTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

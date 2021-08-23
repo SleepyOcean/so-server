@@ -1,8 +1,8 @@
 package com.sleepy.blog.service;
 
-import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.blog.vo.custom.RequestVO;
 import com.sleepy.common.exception.UserOperationIllegalException;
+import com.sleepy.common.http.CommonDTO;
 
 import java.util.Map;
 

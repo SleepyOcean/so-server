@@ -1,7 +1,7 @@
 package com.sleepy.blog.service;
 
 import com.sleepy.blog.dto.ChartOfBarDTO;
-import com.sleepy.blog.dto.CommonDTO;
+import com.sleepy.common.http.CommonDTO;
 
 /**
  * 统计Service

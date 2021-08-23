@@ -1,10 +1,13 @@
 package com.sleepy.blog.service.impl;
 
-import com.sleepy.blog.dto.CommonDTO;
+import com.alibaba.fastjson.JSON;
+import com.sleepy.blog.component.NacosConfigGetter;
 import com.sleepy.blog.entity.SettingEntity;
 import com.sleepy.blog.repository.SettingRepository;
 import com.sleepy.blog.service.SettingService;
 import com.sleepy.blog.vo.SettingVO;
+import com.sleepy.common.constant.HttpStatus;
+import com.sleepy.common.http.CommonDTO;
 import com.sleepy.common.tools.StringTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,9 @@ public class SettingServiceImpl implements SettingService {
 
     @Autowired
     SettingRepository settingRepository;
+
+    @Autowired
+    NacosConfigGetter nacosConfigGetter;
 
     @Override
     public CommonDTO<SettingEntity> save(SettingVO vo) {
@@ -50,5 +56,12 @@ public class SettingServiceImpl implements SettingService {
         CommonDTO<SettingEntity> result = new CommonDTO<>();
         // TODO 获取指定条件配置项
         return result;
+    }
+
+    @Override
+    public CommonDTO<String> getNacosConfig() {
+        String config = nacosConfigGetter.get("SO_SERVER", "blog-site-prod.json");
+
+        return CommonDTO.create(HttpStatus.OK, "success").setResult(JSON.parseObject(config)).build();
     }
 }

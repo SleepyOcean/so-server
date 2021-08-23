@@ -1,8 +1,8 @@
 package com.sleepy.blog.service;
 
-import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.blog.entity.ProjectEntity;
 import com.sleepy.blog.vo.ProjectVO;
+import com.sleepy.common.http.CommonDTO;
 
 /**
  * 项目管理服务

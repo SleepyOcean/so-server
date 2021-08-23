@@ -1,9 +1,9 @@
 package com.sleepy.blog.controller;
 
-import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.blog.entity.SettingEntity;
 import com.sleepy.blog.service.SettingService;
 import com.sleepy.blog.vo.SettingVO;
+import com.sleepy.common.http.CommonDTO;
 import com.sleepy.common.tools.StringTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -34,5 +34,10 @@ public class SettingController {
         } else {
             return settingService.findSetting(vo);
         }
+    }
+
+    @GetMapping("/static")
+    public CommonDTO<String> nacosConfig() {
+        return settingService.getNacosConfig();
     }
 }

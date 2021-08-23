@@ -1,7 +1,6 @@
 package com.sleepy.blog.service.impl;
 
 import com.google.common.collect.Lists;
-import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.blog.entity.ArticleEntity;
 import com.sleepy.blog.entity.CollectionEntity;
 import com.sleepy.blog.entity.TagEntity;
@@ -12,6 +11,7 @@ import com.sleepy.blog.service.CacheService;
 import com.sleepy.blog.service.PostService;
 import com.sleepy.blog.vo.article.CollectionVO;
 import com.sleepy.blog.vo.article.PostVO;
+import com.sleepy.common.http.CommonDTO;
 import com.sleepy.common.model.MapModel;
 import com.sleepy.common.tools.ClassTools;
 import com.sleepy.common.tools.CommonTools;

@@ -1,10 +1,10 @@
 package com.sleepy.blog.service.impl;
 
-import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.blog.entity.ProjectEntity;
 import com.sleepy.blog.repository.ProjectRepository;
 import com.sleepy.blog.service.ProjectService;
 import com.sleepy.blog.vo.ProjectVO;
+import com.sleepy.common.http.CommonDTO;
 import com.sleepy.common.tools.StringTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;

@@ -2,12 +2,12 @@ package com.sleepy.blog.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.nacos.api.config.annotation.NacosValue;
-import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.blog.processor.ScheduleProcessor;
 import com.sleepy.blog.service.CustomService;
 import com.sleepy.blog.task.RequestTask;
 import com.sleepy.blog.vo.custom.RequestVO;
 import com.sleepy.common.exception.UserOperationIllegalException;
+import com.sleepy.common.http.CommonDTO;
 import com.sleepy.common.model.MapModel;
 import com.sleepy.common.tools.CommonTools;
 import com.sleepy.common.tools.HttpTools;

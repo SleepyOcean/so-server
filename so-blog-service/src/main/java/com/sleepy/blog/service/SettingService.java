@@ -1,8 +1,8 @@
 package com.sleepy.blog.service;
 
-import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.blog.entity.SettingEntity;
 import com.sleepy.blog.vo.SettingVO;
+import com.sleepy.common.http.CommonDTO;
 
 /**
  * 配置项Service
@@ -35,4 +35,6 @@ public interface SettingService {
      * @return
      */
     CommonDTO<SettingEntity> findSetting(SettingVO vo);
+
+    CommonDTO<String> getNacosConfig();
 }

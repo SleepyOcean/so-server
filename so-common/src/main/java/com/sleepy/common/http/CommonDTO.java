@@ -20,7 +20,7 @@ public class CommonDTO<T> {
     private List<T> resultList;
     private Map<String, Object> extra;
     private Long total;
-    private HttpStatus status;
+    private int status;
     private String message;
     private Double timeout;
 
@@ -40,7 +40,7 @@ public class CommonDTO<T> {
     }
 
     public CommonDTO(HttpStatus status, String message) {
-        this.status = status;
+        this.status = status.code();
         this.message = message;
     }
 
@@ -77,7 +77,7 @@ public class CommonDTO<T> {
     }
 
     public CommonDTO setStatus(HttpStatus status) {
-        this.status = status;
+        this.status = status.code();
         return this;
     }
 

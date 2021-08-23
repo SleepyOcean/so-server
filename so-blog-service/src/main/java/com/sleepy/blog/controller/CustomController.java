@@ -1,8 +1,8 @@
 package com.sleepy.blog.controller;
 
-import com.sleepy.blog.dto.CommonDTO;
 import com.sleepy.blog.service.CustomService;
 import com.sleepy.blog.vo.custom.RequestVO;
+import com.sleepy.common.http.CommonDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
