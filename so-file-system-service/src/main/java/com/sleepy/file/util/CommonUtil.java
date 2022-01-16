@@ -23,6 +23,9 @@ public class CommonUtil {
     public static String CATEGORY_VIDEO = "video";
     public static String CATEGORY_IMAGE = "image";
     public static String CATEGORY_HTML = ".html";
+    public static String CATEGORY_JS = ".js";
+    public static String CATEGORY_CSS = ".css";
+    public static String CATEGORY_JSON = ".json";
     public static String CATEGORY_OTHER = "other";
     public static List<String> AUDIO_SUFFIX_SET;
     public static List<String> VIDEO_SUFFIX_SET;
