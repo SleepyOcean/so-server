@@ -156,7 +156,6 @@ public class FileServiceImpl implements FileService {
 
         // 设置response的Header
         response.addHeader("Content-Length", "" + file.length());
-        response.setContentType("application/x-font-ttf");
 
         InputStream fis = new BufferedInputStream(new FileInputStream(file));
         byte[] buffer = new byte[fis.available()];
